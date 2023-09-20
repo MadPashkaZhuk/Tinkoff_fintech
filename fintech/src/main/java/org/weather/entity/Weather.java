@@ -1,54 +1,21 @@
 package org.weather.entity;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
 import java.time.LocalDateTime;
 
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class Weather {
     private long regionId;
     private String regionName;
     private int temperatureValue;
     private LocalDateTime dateTime;
-
-    public Weather() {
-
-    }
-
-    public Weather(long regionId, String regionName, int temperatureValue, LocalDateTime dateTime) {
-        this.regionId = regionId;
-        this.regionName = regionName;
-        this.temperatureValue = temperatureValue;
-        this.dateTime = dateTime;
-    }
-    public long getRegionId() {
-        return regionId;
-    }
-
-    public void setRegionId(long regionId) {
-        this.regionId = regionId;
-    }
-
-    public String getRegionName() {
-        return regionName;
-    }
-
-    public void setRegionName(String regionName) {
-        this.regionName = regionName;
-    }
-
-    public int getTemperatureValue() {
-        return temperatureValue;
-    }
-
-    public void setTemperatureValue(int temperatureValue) {
-        this.temperatureValue = temperatureValue;
-    }
-
-    public LocalDateTime getDateTime() {
-        return dateTime;
-    }
-
-    public void setDateTime(LocalDateTime dateTime) {
-        this.dateTime = dateTime;
-    }
 
     @Override
     public String toString() {
