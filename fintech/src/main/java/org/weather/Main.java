@@ -1,6 +1,7 @@
 package org.weather;
 
 import org.weather.entity.Weather;
+import org.weather.service.DefaultWeatherService;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -17,13 +18,16 @@ public class Main {
         long minDay = LocalDate.of(1970, 1, 1).toEpochDay();
         long maxDay = LocalDate.now().toEpochDay();
 
+        int minTemp = -20;
+        int maxTemp = 30;
+
         for(int i = 0; i < 10; i++) {
             LocalDate randomDay = LocalDate.ofEpochDay(random.nextLong(minDay, maxDay));
             LocalTime randomTime = LocalTime.of(random.nextInt(24), random.nextInt(60));
 
-            // id in bounds: [1,6]
+            // id in bounds: [1,6], temperature in bounds: [20, 30)
             Weather curr = new Weather(i % 6 + 1, regions.get((long)(i % 6 + 1)),
-                    random.nextInt(-20, 30), LocalDateTime.of(randomDay, randomTime));
+                    random.nextInt(minTemp, maxTemp), LocalDateTime.of(randomDay, randomTime));
             weathers.add(curr);
         }
         return weathers;

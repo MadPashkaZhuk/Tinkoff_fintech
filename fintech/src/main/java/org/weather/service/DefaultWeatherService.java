@@ -1,4 +1,4 @@
-package org.weather;
+package org.weather.service;
 
 import org.weather.entity.Weather;
 
