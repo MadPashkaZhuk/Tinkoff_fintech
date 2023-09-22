@@ -1,7 +1,8 @@
 package org.weather;
 
 import org.weather.entity.Weather;
-import org.weather.service.DefaultWeatherService;
+import org.weather.service.WeatherService;
+import org.weather.service.impl.DefaultWeatherService;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -34,26 +35,28 @@ public class Main {
     }
 
     public static void main(String[] args) {
+        WeatherService weatherService = DefaultWeatherService.getInstance();
+
         List<Weather> weathers = generateWeatherList();
         for(Weather w : weathers) {
             System.out.println(w);
         }
 
-        System.out.println("\nAverage temperature: " + DefaultWeatherService.getAverageTemperature(weathers) + '\n');
+        System.out.println("\nAverage temperature: " + weatherService.getAverageTemperature(weathers) + '\n');
 
         int lowerTemperature = 15;
         System.out.println("Regions where temperature is more than " + lowerTemperature + ": " +
-                DefaultWeatherService.regionFilterByTemperature(weathers, lowerTemperature) + '\n');
+                weatherService.regionFilterByTemperature(weathers, lowerTemperature) + '\n');
 
         System.out.println("Weather grouped by temperature: ");
         for(Map.Entry<Integer, List<Weather>> w :
-                DefaultWeatherService.weatherGroupingByTemperature(weathers).entrySet()) {
+                weatherService.weatherGroupingByTemperature(weathers).entrySet()) {
             System.out.println(w.getKey() + " - " + w.getValue());
         }
 
         System.out.println("\nTemperature grouped by id: ");
         for(Map.Entry<Long, List<Integer>> w :
-                DefaultWeatherService.temperatureGroupingById(weathers).entrySet()) {
+                weatherService.temperatureGroupingById(weathers).entrySet()) {
             System.out.println(w.getKey() + " - " + w.getValue());
         }
     }
