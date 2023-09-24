@@ -8,31 +8,28 @@ import org.weather.utils.WeatherGenerator;
 import java.util.*;
 
 public class Main {
+    private final static int LOWER_TEMP = 15;
 
     public static void main(String[] args) {
         WeatherService weatherService = DefaultWeatherService.getInstance();
 
         List<Weather> weathers = WeatherGenerator.generateWeatherList();
-        for(Weather w : weathers) {
-            System.out.println(w);
-        }
+        weathers.forEach(System.out::println);
 
-        System.out.println("\nAverage temperature: " + weatherService.getAverageTemperature(weathers) + '\n');
+        Map<String, Double> regionAverageTemperature = weatherService.getAverageTemperatureInRegion(weathers);
+        System.out.println("\nAverage temperature in each region: ");
+        regionAverageTemperature.forEach((key, val) -> System.out.println(key + " - "  + val));
 
-        int lowerTemperature = 15;
-        System.out.println("Regions where temperature is more than " + lowerTemperature + ": " +
-                weatherService.regionFilterByTemperature(weathers, lowerTemperature) + '\n');
+        Set<String> regionsFilteredByTemperature = weatherService.regionFilteredByTemperature(weathers, LOWER_TEMP);
+        System.out.println("\nRegions where temperature is more than " + LOWER_TEMP + ": ");
+        regionsFilteredByTemperature.forEach(System.out::println);
 
-        System.out.println("Weather grouped by temperature: ");
-        for(Map.Entry<Integer, List<Weather>> w :
-                weatherService.weatherGroupingByTemperature(weathers).entrySet()) {
-            System.out.println(w.getKey() + " - " + w.getValue());
-        }
+        Map<Integer, List<Weather>> weatherGroupedByTemp = weatherService.weatherGroupingByTemperature(weathers);
+        System.out.println("\nWeather grouped by temperature: ");
+        weatherGroupedByTemp.forEach((key, val) -> System.out.println(key + " - " + val));
 
+        Map<Long, List<Integer>> tempGroupedById = weatherService.temperatureGroupingById(weathers);
         System.out.println("\nTemperature grouped by id: ");
-        for(Map.Entry<Long, List<Integer>> w :
-                weatherService.temperatureGroupingById(weathers).entrySet()) {
-            System.out.println(w.getKey() + " - " + w.getValue());
-        }
+        tempGroupedById.forEach((key, val) -> System.out.println(key + " - " + val));
     }
 }

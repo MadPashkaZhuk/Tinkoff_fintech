@@ -4,15 +4,11 @@ import lombok.*;
 
 import java.time.LocalDateTime;
 
-@Getter
-@Setter
-@ToString
-@NoArgsConstructor
-@AllArgsConstructor
+@Value
 public class Weather {
-    private long regionId;
-    private String regionName;
-    private int temperatureValue;
-    private LocalDateTime dateTime;
+    long regionId;
+    String regionName;
+    int temperatureValue;
+    LocalDateTime dateTime;
 }
 
