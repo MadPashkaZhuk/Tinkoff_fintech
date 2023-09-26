@@ -8,7 +8,7 @@ import java.time.LocalDateTime;
 public class Weather {
     long regionId;
     String regionName;
-    int temperatureValue;
+    double temperatureValue;
     LocalDateTime dateTime;
 }
 

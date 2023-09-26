@@ -29,21 +29,21 @@ public class DefaultWeatherService implements WeatherService {
     }
 
     @Override
-    public Set<String> regionFilteredByTemperature(Collection<Weather> weathers, int temperature) {
+    public Set<String> regionFilteredByTemperature(Collection<Weather> weathers, double temperature) {
         return weathers.stream()
-                .filter(x -> x.getTemperatureValue() > temperature)
+                .filter(x -> Double.compare(x.getTemperatureValue(), temperature) > 0)
                 .map(Weather::getRegionName)
                 .collect(Collectors.toSet());
     }
 
     @Override
-    public Map<Integer, List<Weather>> weatherGroupingByTemperature(Collection<Weather> weathers) {
+    public Map<Double, List<Weather>> weatherGroupingByTemperature(Collection<Weather> weathers) {
         return weathers.stream()
                 .collect(Collectors.groupingBy(Weather::getTemperatureValue));
     }
 
     @Override
-    public Map<Long, List<Integer>> temperatureGroupingById(Collection<Weather> weathers) {
+    public Map<Long, List<Double>> temperatureGroupingById(Collection<Weather> weathers) {
         return weathers.stream()
                 .collect(Collectors.groupingBy(Weather::getRegionId,
                         Collectors.mapping(Weather::getTemperatureValue, Collectors.toList())));

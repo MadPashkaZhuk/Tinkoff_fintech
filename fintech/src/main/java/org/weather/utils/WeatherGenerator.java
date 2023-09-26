@@ -37,7 +37,7 @@ public class WeatherGenerator {
 
             // id in bounds: [1,REGION_SIZE], temperature in bounds: [MIN_TEMP, MAX_TEMP)
             builder.add(new Weather(i % REGION_SIZE + 1, regions.get((long)(i % REGION_SIZE + 1)),
-                    random.nextInt(MIN_TEMP, MAX_TEMP), LocalDateTime.of(randomDay, randomTime)));
+                    random.nextDouble(MIN_TEMP, MAX_TEMP), LocalDateTime.of(randomDay, randomTime)));
         }
         return builder.build().toList();
     }

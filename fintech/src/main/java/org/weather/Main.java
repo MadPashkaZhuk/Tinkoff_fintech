@@ -24,11 +24,11 @@ public class Main {
         System.out.println("\nRegions where temperature is more than " + LOWER_TEMP + ": ");
         regionsFilteredByTemperature.forEach(System.out::println);
 
-        Map<Integer, List<Weather>> weatherGroupedByTemp = weatherService.weatherGroupingByTemperature(weathers);
+        Map<Double, List<Weather>> weatherGroupedByTemp = weatherService.weatherGroupingByTemperature(weathers);
         System.out.println("\nWeather grouped by temperature: ");
         weatherGroupedByTemp.forEach((key, val) -> System.out.println(key + " - " + val));
 
-        Map<Long, List<Integer>> tempGroupedById = weatherService.temperatureGroupingById(weathers);
+        Map<Long, List<Double>> tempGroupedById = weatherService.temperatureGroupingById(weathers);
         System.out.println("\nTemperature grouped by id: ");
         tempGroupedById.forEach((key, val) -> System.out.println(key + " - " + val));
     }
