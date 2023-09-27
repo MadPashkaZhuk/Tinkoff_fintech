@@ -5,6 +5,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.weather.exception.CustomPageNotFoundException;
 import org.weather.exception.WeatherAlreadyExistsException;
 import org.weather.exception.WeatherNotFoundException;
 
@@ -33,6 +34,14 @@ public class ApplicationExceptionHandler {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(WeatherAlreadyExistsException.class)
     public Map<String, String> handleWeatherAlreadyExistsException(WeatherAlreadyExistsException exception) {
+        Map<String, String> errors = new HashMap<>();
+        errors.put("errorMessage", exception.getMessage());
+        return errors;
+    }
+
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    @ExceptionHandler(CustomPageNotFoundException.class)
+    public Map<String, String> handleCustomPageNotFoundException(CustomPageNotFoundException exception) {
         Map<String, String> errors = new HashMap<>();
         errors.put("errorMessage", exception.getMessage());
         return errors;

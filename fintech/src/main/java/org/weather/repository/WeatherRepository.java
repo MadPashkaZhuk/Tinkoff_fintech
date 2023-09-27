@@ -13,9 +13,9 @@ public interface WeatherRepository {
     Map<UUID, List<Weather>> findAll();
     Optional<List<Weather>> findById(UUID id);
     void saveRegion(String regionName);
-    void saveWeather(String regionName, WeatherDTO payload);
+    void saveWeather(String regionName, WeatherDTO newWeatherDTO);
     UUID getIdByRegionName(String regionName);
-    void updateWeatherWithSameRegionAndDate(UUID id, String regionName, WeatherDTO payload);
+    void updateWeatherWithSameRegionAndDate(UUID id, String regionName, WeatherDTO newWeatherDTO);
     void deleteRegion(UUID currentId, String regionName);
     boolean hasWeatherWithSameIdAndDate(UUID id, LocalDateTime dateTime);
 }

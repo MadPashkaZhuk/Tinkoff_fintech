@@ -36,17 +36,17 @@ public class InMemoryWeatherRepository implements WeatherRepository {
             newId = UUID.randomUUID();
         }
         IdToWeatherMap.put(newId, new ArrayList<>());
-        RegionToIdMap.put(regionName.toLowerCase(), newId);
+        RegionToIdMap.put(regionName, newId);
     }
 
     @Override
-    public void saveWeather(String regionName, WeatherDTO payload) {
-        if(!RegionToIdMap.containsKey(regionName.toLowerCase())) {
+    public void saveWeather(String regionName, WeatherDTO newWeatherDTO) {
+        if(!RegionToIdMap.containsKey(regionName)) {
            this.saveRegion(regionName);
         }
-        UUID curId = RegionToIdMap.get(regionName.toLowerCase());
-        Weather newWeather = new Weather(curId, regionName.toLowerCase(),
-                payload.getTemperatureValue(), payload.getDateTime());
+        UUID curId = RegionToIdMap.get(regionName);
+        Weather newWeather = new Weather(curId, regionName,
+                newWeatherDTO.getTemperatureValue(), newWeatherDTO.getDateTime());
         IdToWeatherMap.get(curId).add(newWeather);
     }
 
@@ -56,11 +56,11 @@ public class InMemoryWeatherRepository implements WeatherRepository {
     }
 
     @Override
-    public void updateWeatherWithSameRegionAndDate(UUID id, String regionName, WeatherDTO payload) {
-        Weather newWeather = new Weather(id, regionName.toLowerCase(),
-                payload.getTemperatureValue(), payload.getDateTime());
+    public void updateWeatherWithSameRegionAndDate(UUID id, String regionName, WeatherDTO newWeatherDTO) {
+        Weather newWeather = new Weather(id, regionName,
+                newWeatherDTO.getTemperatureValue(), newWeatherDTO.getDateTime());
         List<Weather> newWeatherList = this.IdToWeatherMap.get(id).stream()
-                .map(x -> (x.getDateTime().isEqual(payload.getDateTime())) ? newWeather : x)
+                .map(x -> (x.getDateTime().isEqual(newWeatherDTO.getDateTime())) ? newWeather : x)
                 .collect(Collectors.toList());
         this.IdToWeatherMap.put(id, newWeatherList);
     }
