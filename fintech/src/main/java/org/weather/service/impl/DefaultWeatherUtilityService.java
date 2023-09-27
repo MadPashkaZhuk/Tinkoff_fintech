@@ -1,22 +1,22 @@
 package org.weather.service.impl;
 
 import org.weather.entity.Weather;
-import org.weather.service.WeatherService;
+import org.weather.service.WeatherUtilityService;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class DefaultWeatherService implements WeatherService {
+public class DefaultWeatherUtilityService implements WeatherUtilityService {
 
     private static class SingletonHelper {
-        private static final DefaultWeatherService INSTANCE = new DefaultWeatherService();
+        private static final DefaultWeatherUtilityService INSTANCE = new DefaultWeatherUtilityService();
     }
 
-    public static DefaultWeatherService getInstance() {
-        return DefaultWeatherService.SingletonHelper.INSTANCE;
+    public static DefaultWeatherUtilityService getInstance() {
+        return DefaultWeatherUtilityService.SingletonHelper.INSTANCE;
     }
 
-    private DefaultWeatherService() {}
+    private DefaultWeatherUtilityService() {}
 
     @Override
     public Map<String, Double> getAverageTemperatureInRegion(Collection<Weather> weathers) {
