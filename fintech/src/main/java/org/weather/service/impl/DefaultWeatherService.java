@@ -3,10 +3,7 @@ package org.weather.service.impl;
 import org.weather.entity.Weather;
 import org.weather.service.WeatherService;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class DefaultWeatherService implements WeatherService {
@@ -43,7 +40,7 @@ public class DefaultWeatherService implements WeatherService {
     }
 
     @Override
-    public Map<Long, List<Double>> temperatureGroupingById(Collection<Weather> weathers) {
+    public Map<UUID, List<Double>> temperatureGroupingById(Collection<Weather> weathers) {
         return weathers.stream()
                 .collect(Collectors.groupingBy(Weather::getRegionId,
                         Collectors.mapping(Weather::getTemperatureValue, Collectors.toList())));

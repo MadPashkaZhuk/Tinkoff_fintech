@@ -2,10 +2,7 @@ package org.weather.service;
 
 import org.weather.entity.Weather;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 public interface WeatherService {
     Map<String, Double> getAverageTemperatureInRegion(Collection<Weather> weathers);
@@ -14,5 +11,5 @@ public interface WeatherService {
 
     Map<Double, List<Weather>> weatherGroupingByTemperature(Collection<Weather> weathers);
 
-    Map<Long, List<Double>> temperatureGroupingById(Collection<Weather> weathers);
+    Map<UUID, List<Double>> temperatureGroupingById(Collection<Weather> weathers);
 }

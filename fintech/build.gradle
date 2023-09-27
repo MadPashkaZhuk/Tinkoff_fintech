@@ -17,6 +17,9 @@ repositories {
 }
 
 dependencies {
+    // https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-validation
+    implementation group: 'org.springframework.boot', name: 'spring-boot-starter-validation', version: '3.1.4'
+
     // https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-web
     implementation group: 'org.springframework.boot', name: 'spring-boot-starter-web', version: '3.1.4'
 
@@ -31,7 +34,7 @@ shadowJar {
     archiveClassifier.set('fat')
     archiveVersion.set('1.0')
     manifest {
-        attributes 'Main-Class' : 'org.weather.Main'
+        attributes 'Main-Class' : 'org.weather.MainApplication'
     }
 }
 
