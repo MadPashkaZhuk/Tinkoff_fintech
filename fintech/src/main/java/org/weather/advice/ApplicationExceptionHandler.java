@@ -23,7 +23,7 @@ public class ApplicationExceptionHandler {
         return errors;
     }
 
-    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
     @ExceptionHandler(WeatherNotFoundException.class)
     public Map<String, String> handleWeatherNotFoundException(WeatherNotFoundException exception) {
         Map<String, String> errors = new HashMap<>();

@@ -16,7 +16,7 @@ import java.util.UUID;
 @Service
 public class DefaultWeatherControllerService implements WeatherControllerService {
     private final WeatherRepository weatherRepository;
-    private final String WEATHER_ALREADY_EXISTS_MESSAGE = "Weather with same region and date already exists. " +
+    private final static String WEATHER_ALREADY_EXISTS_MESSAGE = "Weather with same region and date already exists. " +
             "If you need to update it, use Put method";
 
     public DefaultWeatherControllerService(WeatherRepository weatherRepository) {
