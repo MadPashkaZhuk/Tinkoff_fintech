@@ -14,4 +14,4 @@
     ``gradlew build``
 
 ### Запуск
-1.  Выполняем: ``java -jar build/libs/fintech-1.1-boot.jar``
+1. Выполняем: ``java -jar build/libs/fintech-1.1-boot.jar``

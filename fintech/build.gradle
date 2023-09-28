@@ -40,5 +40,5 @@ tasks.named("jar") {
 
 tasks.named("bootJar") {
     archiveClassifier = 'boot'
-    archiveBaseName  = 'fintech'
+    archiveBaseName = 'fintech'
 }

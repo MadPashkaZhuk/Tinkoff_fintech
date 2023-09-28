@@ -19,4 +19,3 @@ public interface WeatherRepository {
     void deleteRegion(UUID currentId, String regionName);
     boolean hasWeatherWithSameIdAndDate(UUID id, LocalDateTime dateTime);
 }
-
