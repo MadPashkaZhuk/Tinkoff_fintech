@@ -42,8 +42,8 @@ public class WeatherRestController {
     }
 
     @GetMapping("/{regionName}")
-    @Operation(summary = "Get all weather by region name",
-            description = "Get list of weather for a specific region by name.")
+    @Operation(summary = "Get all weather by region name and current date",
+            description = "Get list of weather for a specific region by name and current date.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Weather data retrieved successfully"),
             @ApiResponse(responseCode = "404", description = "Region doesn't exist in database")
@@ -53,11 +53,12 @@ public class WeatherRestController {
         if(currentId == null) {
             throw new WeatherNotFoundException(WEATHER_NOT_FOUND_MESSAGE);
         }
-        return ResponseEntity.of(this.weatherService
-                .findById(currentId));
+        return ResponseEntity.ok()
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(this.weatherService.findWeatherListByIdAndCurrentDay(currentId));
     }
 
-    @Operation(summary = "Add new weather to region",
+    @Operation(summary = "Add new weather info to region",
             description = "Add new region and/or add weather info to this region.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "New weather data created successfully"),

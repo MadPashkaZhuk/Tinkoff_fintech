@@ -34,27 +34,9 @@ public class DefaultWeatherControllerService implements WeatherControllerService
     }
 
     @Override
-    public void saveRegion(String regionName) {
-        regionName = regionName.toLowerCase();
-        weatherRepository.saveRegion(regionName);
-    }
-
-    @Override
-    public void saveWeather(String regionName, WeatherDTO newWeatherDTO) {
-        regionName = regionName.toLowerCase();
-        weatherRepository.saveWeather(regionName, newWeatherDTO);
-    }
-
-    @Override
     public UUID getIdByRegionName(String regionName) {
         regionName = regionName.toLowerCase();
         return weatherRepository.getIdByRegionName(regionName);
-    }
-
-    @Override
-    public void updateWeatherWithSameRegionAndDate(UUID id, String regionName, WeatherDTO newWeatherDTO) {
-        regionName = regionName.toLowerCase();
-        this.weatherRepository.updateWeatherWithSameRegionAndDate(id, regionName, newWeatherDTO);
     }
 
     @Override
@@ -64,14 +46,9 @@ public class DefaultWeatherControllerService implements WeatherControllerService
     }
 
     @Override
-    public boolean hasWeatherWithSameIdAndDate(UUID id, LocalDateTime dateTime) {
-        return weatherRepository.hasWeatherWithSameIdAndDate(id, dateTime);
-    }
-
-    @Override
     public void createNewWeather(String regionName, WeatherDTO newWeatherDTO) {
         regionName = regionName.toLowerCase();
-        UUID currentId = this.weatherRepository.getIdByRegionName(regionName);
+        UUID currentId = this.getIdByRegionName(regionName);
         if(currentId != null && this.weatherRepository
                 .hasWeatherWithSameIdAndDate(currentId, newWeatherDTO.getDateTime())) {
             throw new WeatherAlreadyExistsException(WEATHER_ALREADY_EXISTS_MESSAGE);
@@ -88,5 +65,15 @@ public class DefaultWeatherControllerService implements WeatherControllerService
         else {
             this.weatherRepository.saveWeather(regionName, newWeatherDTO);
         }
+    }
+
+    @Override
+    public List<Weather> findWeatherListByIdAndCurrentDay(UUID currentId) {
+        List<Weather> allWeatherForRegion = this.findById(currentId).get();
+        LocalDateTime now = LocalDateTime.now();
+        return allWeatherForRegion.stream()
+                .filter(x -> (x.getDateTime().getYear() == now.getYear() &&
+                        x.getDateTime().getDayOfYear() == now.getDayOfYear()))
+                .toList();
     }
 }
