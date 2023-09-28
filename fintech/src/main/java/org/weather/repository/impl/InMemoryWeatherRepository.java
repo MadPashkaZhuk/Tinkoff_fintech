@@ -21,12 +21,12 @@ public class InMemoryWeatherRepository implements WeatherRepository {
 
     @Override
     public Map<UUID, List<Weather>> findAll() {
-        return IdToWeatherMap;
+        return new HashMap<>(IdToWeatherMap);
     }
 
     @Override
     public Optional<List<Weather>> findById(UUID id) {
-        return Optional.ofNullable(this.IdToWeatherMap.get(id));
+        return Optional.of(new ArrayList<>(this.IdToWeatherMap.get(id)));
     }
 
     @Override

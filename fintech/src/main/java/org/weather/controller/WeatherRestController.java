@@ -124,7 +124,7 @@ public class WeatherRestController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "404", description = "This page doesn't exist")
     })
-    @GetMapping(value = "/{text}/**")
+    @RequestMapping(value = "/{text}/**")
     public ResponseEntity<?> handleNonExistingPage() {
         throw new CustomPageNotFoundException(PAGE_NOT_FOUND_MESSAGE);
     }

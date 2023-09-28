@@ -12,8 +12,8 @@ public interface WeatherControllerService {
     Map<UUID, List<Weather>> findAll();
     Optional<List<Weather>> findById(UUID id);
     UUID getIdByRegionName(String regionName);
-    void deleteRegion(UUID currentId, String regionName);
+    void deleteRegion(UUID id, String regionName);
     void createNewWeather(String regionName, WeatherDTO newWeatherDTO);
     void updateWeatherTemperature(UUID id, String regionName, WeatherDTO newWeatherDTO);
-    List<Weather> findWeatherListByIdAndCurrentDay(UUID currentId);
+    List<Weather> findWeatherListByIdAndCurrentDay(UUID id);
 }

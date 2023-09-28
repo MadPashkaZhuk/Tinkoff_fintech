@@ -40,9 +40,9 @@ public class DefaultWeatherControllerService implements WeatherControllerService
     }
 
     @Override
-    public void deleteRegion(UUID currentId, String regionName) {
+    public void deleteRegion(UUID id, String regionName) {
         regionName = regionName.toLowerCase();
-        weatherRepository.deleteRegion(currentId, regionName);
+        weatherRepository.deleteRegion(id, regionName);
     }
 
     @Override
@@ -68,8 +68,8 @@ public class DefaultWeatherControllerService implements WeatherControllerService
     }
 
     @Override
-    public List<Weather> findWeatherListByIdAndCurrentDay(UUID currentId) {
-        List<Weather> allWeatherForRegion = this.findById(currentId).get();
+    public List<Weather> findWeatherListByIdAndCurrentDay(UUID id) {
+        List<Weather> allWeatherForRegion = this.findById(id).get();
         LocalDateTime now = LocalDateTime.now();
         return allWeatherForRegion.stream()
                 .filter(x -> (x.getDateTime().getYear() == now.getYear() &&
