@@ -1,0 +1,29 @@
+plugins {
+    id 'java'
+    id 'com.github.johnrengelman.shadow' version '8.1.1'
+}
+
+group 'org.weather'
+version '1.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    // https://mvnrepository.com/artifact/org.projectlombok/lombok
+    compileOnly 'org.projectlombok:lombok:1.18.28'
+    annotationProcessor 'org.projectlombok:lombok:1.18.28'
+
+}
+
+shadowJar {
+    archiveBaseName.set('fintech')
+    archiveClassifier.set('fat')
+    archiveVersion.set('1.0')
+    manifest {
+        attributes 'Main-Class' : 'org.weather.Main'
+    }
+}
+
+tasks.build.dependsOn tasks.shadowJar
