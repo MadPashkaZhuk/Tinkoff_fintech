@@ -11,69 +11,71 @@ import java.util.stream.Collectors;
 
 @Repository
 public class InMemoryWeatherRepository implements WeatherRepository {
-    private final Map<String, UUID> RegionToIdMap;
-    private final Map<UUID, List<Weather>> IdToWeatherMap;
+    private final Map<String, UUID> regionToIdMap;
+    private final Map<UUID, List<Weather>> idToWeatherMap;
 
     public InMemoryWeatherRepository() {
-        RegionToIdMap = new HashMap<>();
-        IdToWeatherMap = new HashMap<>();
+        regionToIdMap = new HashMap<>();
+        idToWeatherMap = new HashMap<>();
     }
 
     @Override
-    public Map<UUID, List<Weather>> findAll() {
-        return new HashMap<>(IdToWeatherMap);
+    public Map<String, List<Weather>> findAll() {
+        Map<String, List<Weather>>  regionToWeatherMap = new HashMap<>();
+        regionToIdMap.forEach( (k, v) -> regionToWeatherMap.put(k, idToWeatherMap.get(v)));
+        return regionToWeatherMap;
     }
 
     @Override
     public List<Weather> findById(UUID id) {
-        return new ArrayList<>(this.IdToWeatherMap.get(id));
+        return new ArrayList<>(this.idToWeatherMap.get(id));
     }
 
     @Override
     public void saveRegion(String regionName) {
         UUID newId = UUID.randomUUID();
-        while (IdToWeatherMap.containsKey(newId)) {
+        while (idToWeatherMap.containsKey(newId)) {
             newId = UUID.randomUUID();
         }
-        IdToWeatherMap.put(newId, new ArrayList<>());
-        RegionToIdMap.put(regionName, newId);
+        idToWeatherMap.put(newId, new ArrayList<>());
+        regionToIdMap.put(regionName, newId);
     }
 
     @Override
     public void saveWeather(String regionName, WeatherDTO newWeatherDTO) {
-        if(!RegionToIdMap.containsKey(regionName)) {
+        if(!regionToIdMap.containsKey(regionName)) {
            this.saveRegion(regionName);
         }
-        UUID curId = RegionToIdMap.get(regionName);
+        UUID curId = regionToIdMap.get(regionName);
         Weather newWeather = new Weather(curId, regionName,
                 newWeatherDTO.getTemperatureValue(), newWeatherDTO.getDateTime());
-        IdToWeatherMap.get(curId).add(newWeather);
+        idToWeatherMap.get(curId).add(newWeather);
     }
 
     @Override
     public UUID getIdByRegionName(String regionName) {
-        return RegionToIdMap.get(regionName);
+        return regionToIdMap.get(regionName);
     }
 
     @Override
     public void updateWeatherWithSameRegionAndDate(UUID id, String regionName, WeatherDTO newWeatherDTO) {
         Weather newWeather = new Weather(id, regionName,
                 newWeatherDTO.getTemperatureValue(), newWeatherDTO.getDateTime());
-        List<Weather> newWeatherList = this.IdToWeatherMap.get(id).stream()
+        List<Weather> newWeatherList = this.idToWeatherMap.get(id).stream()
                 .map(x -> (x.getDateTime().isEqual(newWeatherDTO.getDateTime())) ? newWeather : x)
                 .collect(Collectors.toList());
-        this.IdToWeatherMap.put(id, newWeatherList);
+        this.idToWeatherMap.put(id, newWeatherList);
     }
 
     @Override
     public void deleteRegion(UUID currentId, String regionName) {
-        this.IdToWeatherMap.remove(currentId);
-        this.RegionToIdMap.remove(regionName);
+        this.idToWeatherMap.remove(currentId);
+        this.regionToIdMap.remove(regionName);
     }
 
     @Override
     public boolean hasWeatherWithSameIdAndDate(UUID id, LocalDateTime dateTime) {
-        return this.IdToWeatherMap.get(id).stream()
+        return this.idToWeatherMap.get(id).stream()
                 .anyMatch(x -> x.getDateTime().isEqual(dateTime));
     }
 }

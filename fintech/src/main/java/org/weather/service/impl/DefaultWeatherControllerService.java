@@ -1,16 +1,19 @@
 package org.weather.service.impl;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.MessageSource;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.weather.dto.WeatherDTO;
 import org.weather.entity.Weather;
-import org.weather.exception.BaseWeatherException;
+import org.weather.exception.WeatherAlreadyExistsException;
+import org.weather.exception.WeatherNotFoundException;
 import org.weather.repository.WeatherRepository;
 import org.weather.service.WeatherControllerService;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
 
@@ -18,12 +21,10 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class DefaultWeatherControllerService implements WeatherControllerService {
     private final WeatherRepository weatherRepository;
-    private final static String WEATHER_ALREADY_EXISTS_MESSAGE = "Weather with same region and date already exists. " +
-            "If you need to update it, use Put method";
-    private final static String WEATHER_NOT_FOUND_MESSAGE = "Region with this name doesn't exist.";
+    private final MessageSource messageSource;
 
     @Override
-    public Map<UUID, List<Weather>> findAll() {
+    public Map<String, List<Weather>> findAll() {
         return weatherRepository.findAll();
     }
 
@@ -34,7 +35,6 @@ public class DefaultWeatherControllerService implements WeatherControllerService
 
     @Override
     public UUID getIdByRegionName(String regionName) {
-        regionName = regionName.toLowerCase();
         return weatherRepository.getIdByRegionName(regionName);
     }
 
@@ -42,18 +42,17 @@ public class DefaultWeatherControllerService implements WeatherControllerService
     public void deleteRegion(String regionName) {
         UUID id = this.getIdByRegionName(regionName);
         if(id != null) {
-            regionName = regionName.toLowerCase();
             weatherRepository.deleteRegion(id, regionName);
         }
     }
 
     @Override
     public List<Weather> createNewWeather(String regionName, WeatherDTO newWeatherDTO) {
-        regionName = regionName.toLowerCase();
         UUID id = this.getIdByRegionName(regionName);
         if(id != null && this.weatherRepository
                 .hasWeatherWithSameIdAndDate(id, newWeatherDTO.getDateTime())) {
-            throw new BaseWeatherException(400, WEATHER_ALREADY_EXISTS_MESSAGE);
+            throw new WeatherAlreadyExistsException(HttpStatus.BAD_REQUEST, messageSource
+                    .getMessage("weather.already.exists.message",null, Locale.getDefault()));
         }
         this.weatherRepository.saveWeather(regionName, newWeatherDTO);
         return this.findWeatherListByRegionAndCurrentDay(regionName);
@@ -63,9 +62,9 @@ public class DefaultWeatherControllerService implements WeatherControllerService
     public List<Weather> updateWeatherTemperature(String regionName, WeatherDTO newWeatherDTO) {
         UUID id = this.getIdByRegionName(regionName);
         if(id == null) {
-            throw new BaseWeatherException(404, WEATHER_NOT_FOUND_MESSAGE);
+            throw new WeatherNotFoundException(HttpStatus.NOT_FOUND, messageSource
+                    .getMessage("weather.not.found.message",null,Locale.getDefault()));
         }
-        regionName = regionName.toLowerCase();
         if(this.weatherRepository.hasWeatherWithSameIdAndDate(id, newWeatherDTO.getDateTime())) {
             this.weatherRepository.updateWeatherWithSameRegionAndDate(id, regionName, newWeatherDTO);
         }
@@ -79,10 +78,10 @@ public class DefaultWeatherControllerService implements WeatherControllerService
     public List<Weather> findWeatherListByRegionAndCurrentDay(String regionName) {
         UUID id = this.getIdByRegionName(regionName);
         if(id == null) {
-            throw new BaseWeatherException(404, WEATHER_NOT_FOUND_MESSAGE);
+            throw new WeatherNotFoundException(HttpStatus.NOT_FOUND, messageSource
+                    .getMessage("weather.not.found.message",null,Locale.getDefault()));
         }
         List<Weather> allWeatherForRegion = this.findById(id);
-        LocalDateTime now = LocalDateTime.now();
         return allWeatherForRegion.stream()
                 .filter(x -> (x.getDateTime().toLocalDate().equals(LocalDate.now())))
                 .toList();

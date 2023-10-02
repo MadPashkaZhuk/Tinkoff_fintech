@@ -14,10 +14,11 @@ import java.util.Map;
 
 @RestControllerAdvice
 public class ApplicationExceptionHandler {
+
     @ExceptionHandler(BaseWeatherException.class)
     public ResponseEntity<BaseExceptionDTO> handleBaseException(BaseWeatherException ex) {
         BaseExceptionDTO baseExceptionDTO = new BaseExceptionDTO(ex.getStatus(), ex.getExceptionMessage());
-        return new ResponseEntity<>(baseExceptionDTO, HttpStatus.valueOf(ex.getStatus()));
+        return new ResponseEntity<>(baseExceptionDTO, ex.getStatus());
     }
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)
@@ -26,5 +27,11 @@ public class ApplicationExceptionHandler {
         Map<String, String> errors = new HashMap<>();
         exception.getBindingResult().getFieldErrors().forEach(x -> errors.put(x.getField(), x.getDefaultMessage()));
         return errors;
+    }
+    @ExceptionHandler(Throwable.class)
+    public ResponseEntity<BaseExceptionDTO> handleUnexpectedExceptions(Throwable exception) {
+        BaseExceptionDTO baseExceptionDTO =
+                new BaseExceptionDTO(HttpStatus.INTERNAL_SERVER_ERROR, exception.getMessage());
+        return new ResponseEntity<>(baseExceptionDTO, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }

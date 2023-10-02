@@ -6,11 +6,10 @@ import org.weather.entity.Weather;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.UUID;
 
 public interface WeatherRepository {
-    Map<UUID, List<Weather>> findAll();
+    Map<String, List<Weather>> findAll();
     List<Weather> findById(UUID id);
     void saveRegion(String regionName);
     void saveWeather(String regionName, WeatherDTO newWeatherDTO);

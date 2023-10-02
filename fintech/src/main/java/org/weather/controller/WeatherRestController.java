@@ -11,19 +11,16 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 import org.weather.dto.WeatherDTO;
 import org.weather.entity.Weather;
-import org.weather.exception.BaseWeatherException;
 import org.weather.service.WeatherControllerService;
 
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/weather")
 @RequiredArgsConstructor
 public class WeatherRestController {
     private final WeatherControllerService weatherService;
-    private final static String PAGE_NOT_FOUND_MESSAGE = "Page you are trying to get doesn't exist.";
 
     @Operation(summary = "Show all weather info",
             description = "Show all weather info for all regions.")
@@ -31,7 +28,7 @@ public class WeatherRestController {
             @ApiResponse(responseCode = "200", description = "All information is shown")
     })
     @GetMapping
-    public ResponseEntity<Map<UUID, List<Weather>>> getAllWeather() {
+    public ResponseEntity<Map<String, List<Weather>>> getAllWeather() {
         return ResponseEntity.ok()
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(this.weatherService.findAll());
@@ -96,15 +93,5 @@ public class WeatherRestController {
         this.weatherService.deleteRegion(regionName);
         return ResponseEntity.noContent()
                 .build();
-    }
-
-    @Operation(summary = "Grab all wrong urls",
-            description = "Process situations, when users tries to access non-existing page.")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "404", description = "This page doesn't exist")
-    })
-    @RequestMapping(value = "/{text}/**")
-    public ResponseEntity<?> handleNonExistingPage() {
-        throw new BaseWeatherException(404, PAGE_NOT_FOUND_MESSAGE);
     }
 }

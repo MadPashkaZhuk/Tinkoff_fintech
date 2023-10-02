@@ -8,7 +8,7 @@ import java.util.Map;
 import java.util.UUID;
 
 public interface WeatherControllerService {
-    Map<UUID, List<Weather>> findAll();
+    Map<String, List<Weather>> findAll();
     List<Weather> findById(UUID id);
     UUID getIdByRegionName(String regionName);
     void deleteRegion(String regionName);
