@@ -25,8 +25,8 @@ public class InMemoryWeatherRepository implements WeatherRepository {
     }
 
     @Override
-    public Optional<List<Weather>> findById(UUID id) {
-        return Optional.of(new ArrayList<>(this.IdToWeatherMap.get(id)));
+    public List<Weather> findById(UUID id) {
+        return new ArrayList<>(this.IdToWeatherMap.get(id));
     }
 
     @Override

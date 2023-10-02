@@ -11,7 +11,7 @@ import java.util.UUID;
 
 public interface WeatherRepository {
     Map<UUID, List<Weather>> findAll();
-    Optional<List<Weather>> findById(UUID id);
+    List<Weather> findById(UUID id);
     void saveRegion(String regionName);
     void saveWeather(String regionName, WeatherDTO newWeatherDTO);
     UUID getIdByRegionName(String regionName);

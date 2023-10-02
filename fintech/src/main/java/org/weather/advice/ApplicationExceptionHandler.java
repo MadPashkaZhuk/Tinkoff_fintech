@@ -1,49 +1,30 @@
 package org.weather.advice;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-import org.weather.exception.CustomPageNotFoundException;
-import org.weather.exception.WeatherAlreadyExistsException;
-import org.weather.exception.WeatherNotFoundException;
+import org.weather.dto.BaseExceptionDTO;
+import org.weather.exception.BaseWeatherException;
 
 import java.util.HashMap;
 import java.util.Map;
 
 @RestControllerAdvice
 public class ApplicationExceptionHandler {
+    @ExceptionHandler(BaseWeatherException.class)
+    public ResponseEntity<BaseExceptionDTO> handleBaseException(BaseWeatherException ex) {
+        BaseExceptionDTO baseExceptionDTO = new BaseExceptionDTO(ex.getStatus(), ex.getExceptionMessage());
+        return new ResponseEntity<>(baseExceptionDTO, HttpStatus.valueOf(ex.getStatus()));
+    }
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public Map<String, String> handleInvalidArgument(MethodArgumentNotValidException exception) {
         Map<String, String> errors = new HashMap<>();
         exception.getBindingResult().getFieldErrors().forEach(x -> errors.put(x.getField(), x.getDefaultMessage()));
-        return errors;
-    }
-
-    @ResponseStatus(HttpStatus.NOT_FOUND)
-    @ExceptionHandler(WeatherNotFoundException.class)
-    public Map<String, String> handleWeatherNotFoundException(WeatherNotFoundException exception) {
-        Map<String, String> errors = new HashMap<>();
-        errors.put("errorMessage", exception.getMessage());
-        return errors;
-    }
-
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    @ExceptionHandler(WeatherAlreadyExistsException.class)
-    public Map<String, String> handleWeatherAlreadyExistsException(WeatherAlreadyExistsException exception) {
-        Map<String, String> errors = new HashMap<>();
-        errors.put("errorMessage", exception.getMessage());
-        return errors;
-    }
-
-    @ResponseStatus(HttpStatus.NOT_FOUND)
-    @ExceptionHandler(CustomPageNotFoundException.class)
-    public Map<String, String> handleCustomPageNotFoundException(CustomPageNotFoundException exception) {
-        Map<String, String> errors = new HashMap<>();
-        errors.put("errorMessage", exception.getMessage());
         return errors;
     }
 }

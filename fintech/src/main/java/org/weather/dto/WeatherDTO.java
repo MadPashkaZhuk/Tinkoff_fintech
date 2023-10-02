@@ -8,7 +8,8 @@ import java.time.LocalDateTime;
 
 @Value
 public class WeatherDTO {
-    @Schema(name = "Temperature", requiredMode = Schema.RequiredMode.REQUIRED, description = "Double temperature value, no restrictions for range", example = "100")
+    @Schema(name = "Temperature", requiredMode = Schema.RequiredMode.REQUIRED,
+            description = "Double temperature value, no restrictions for range", example = "100")
     double temperatureValue;
     @NotNull(message = "Date and time can't be null")
     @Schema(type = "string", name = "Weather Date and Time", requiredMode = Schema.RequiredMode.REQUIRED,

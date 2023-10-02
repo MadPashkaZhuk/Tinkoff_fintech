@@ -4,14 +4,14 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 import org.weather.dto.WeatherDTO;
 import org.weather.entity.Weather;
-import org.weather.exception.CustomPageNotFoundException;
-import org.weather.exception.WeatherNotFoundException;
+import org.weather.exception.BaseWeatherException;
 import org.weather.service.WeatherControllerService;
 
 import java.util.List;
@@ -20,14 +20,10 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/weather")
+@RequiredArgsConstructor
 public class WeatherRestController {
     private final WeatherControllerService weatherService;
-    private final static String WEATHER_NOT_FOUND_MESSAGE = "Region with this name doesn't exist.";
     private final static String PAGE_NOT_FOUND_MESSAGE = "Page you are trying to get doesn't exist.";
-
-    public WeatherRestController(WeatherControllerService weatherService) {
-        this.weatherService = weatherService;
-    }
 
     @Operation(summary = "Show all weather info",
             description = "Show all weather info for all regions.")
@@ -49,13 +45,9 @@ public class WeatherRestController {
             @ApiResponse(responseCode = "404", description = "Region doesn't exist in database")
     })
     public ResponseEntity<List<Weather>> getWeatherById(@PathVariable("regionName") String regionName) {
-        UUID currentId = this.weatherService.getIdByRegionName(regionName);
-        if(currentId == null) {
-            throw new WeatherNotFoundException(WEATHER_NOT_FOUND_MESSAGE);
-        }
         return ResponseEntity.ok()
                 .contentType(MediaType.APPLICATION_JSON)
-                .body(this.weatherService.findWeatherListByIdAndCurrentDay(currentId));
+                .body(this.weatherService.findWeatherListByRegionAndCurrentDay(regionName));
     }
 
     @Operation(summary = "Add new weather info to region",
@@ -69,13 +61,11 @@ public class WeatherRestController {
     public ResponseEntity<?> createNewWeather(@PathVariable("regionName") String regionName,
                                               @RequestBody @Valid WeatherDTO newWeatherDTO,
                                               UriComponentsBuilder uriComponentsBuilder) {
-        this.weatherService.createNewWeather(regionName, newWeatherDTO);
         return ResponseEntity.created(uriComponentsBuilder
                         .path("/api/weather/{regionName}")
                         .build(Map.of("regionName", regionName)))
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .body(weatherService
-                                .findById(weatherService.getIdByRegionName(regionName)));
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(this.weatherService.createNewWeather(regionName, newWeatherDTO));
     }
 
     @Operation(summary = "Update weather info for region",
@@ -89,34 +79,23 @@ public class WeatherRestController {
     public ResponseEntity<?> updateWeatherTemperature(@PathVariable("regionName") String regionName,
                                                       @RequestBody WeatherDTO newWeatherDTO,
                                                       UriComponentsBuilder uriComponentsBuilder) {
-        UUID currentId = this.weatherService.getIdByRegionName(regionName);
-        if(currentId == null) {
-            throw new WeatherNotFoundException(WEATHER_NOT_FOUND_MESSAGE);
-        }
-        this.weatherService.updateWeatherTemperature(currentId, regionName, newWeatherDTO);
         return ResponseEntity.created(uriComponentsBuilder
                         .path("/api/weather/{regionName}")
                         .build(Map.of("regionName", regionName)))
                 .contentType(MediaType.APPLICATION_JSON)
-                .body(weatherService.findById(currentId));
+                .body(this.weatherService.updateWeatherTemperature(regionName, newWeatherDTO));
     }
 
     @Operation(summary = "Delete region in database",
             description = "Delete all region info and region itself.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Weather deleted successfully"),
-            @ApiResponse(responseCode = "404", description = "Region doesn't exist in database")
+            @ApiResponse(responseCode = "204", description = "Weather deleted successfully"),
     })
     @DeleteMapping("/{regionName}")
     public ResponseEntity<?> handleDeleteRegion(@PathVariable("regionName") String regionName) {
-        UUID currentId = this.weatherService.getIdByRegionName(regionName);
-        if(currentId == null) {
-            throw new WeatherNotFoundException(WEATHER_NOT_FOUND_MESSAGE);
-        }
-        this.weatherService.deleteRegion(currentId, regionName);
-        return ResponseEntity.ok()
-                .contentType(MediaType.APPLICATION_JSON)
-                .body(this.weatherService.findAll());
+        this.weatherService.deleteRegion(regionName);
+        return ResponseEntity.noContent()
+                .build();
     }
 
     @Operation(summary = "Grab all wrong urls",
@@ -126,6 +105,6 @@ public class WeatherRestController {
     })
     @RequestMapping(value = "/{text}/**")
     public ResponseEntity<?> handleNonExistingPage() {
-        throw new CustomPageNotFoundException(PAGE_NOT_FOUND_MESSAGE);
+        throw new BaseWeatherException(404, PAGE_NOT_FOUND_MESSAGE);
     }
 }
