@@ -60,11 +60,7 @@ public class DefaultWeatherControllerService implements WeatherControllerService
 
     @Override
     public List<Weather> updateWeatherTemperature(String regionName, WeatherDTO newWeatherDTO) {
-        UUID id = this.getIdByRegionName(regionName);
-        if(id == null) {
-            throw new WeatherNotFoundException(HttpStatus.NOT_FOUND, messageSource
-                    .getMessage("weather.not.found.message",null,Locale.getDefault()));
-        }
+        UUID id = getValidatedIdByRegionName(regionName);
         if(this.weatherRepository.hasWeatherWithSameIdAndDate(id, newWeatherDTO.getDateTime())) {
             this.weatherRepository.updateWeatherWithSameRegionAndDate(id, regionName, newWeatherDTO);
         }
@@ -76,14 +72,19 @@ public class DefaultWeatherControllerService implements WeatherControllerService
 
     @Override
     public List<Weather> findWeatherListByRegionAndCurrentDay(String regionName) {
+        UUID id = getValidatedIdByRegionName(regionName);
+        List<Weather> allWeatherForRegion = this.findById(id);
+        return allWeatherForRegion.stream()
+                .filter(x -> (x.getDateTime().toLocalDate().equals(LocalDate.now())))
+                .toList();
+    }
+
+    public UUID getValidatedIdByRegionName(String regionName) {
         UUID id = this.getIdByRegionName(regionName);
         if(id == null) {
             throw new WeatherNotFoundException(HttpStatus.NOT_FOUND, messageSource
                     .getMessage("weather.not.found.message",null,Locale.getDefault()));
         }
-        List<Weather> allWeatherForRegion = this.findById(id);
-        return allWeatherForRegion.stream()
-                .filter(x -> (x.getDateTime().toLocalDate().equals(LocalDate.now())))
-                .toList();
+        return id;
     }
 }
