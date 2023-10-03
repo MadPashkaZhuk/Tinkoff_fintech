@@ -55,7 +55,7 @@ public class DefaultWeatherControllerService implements WeatherControllerService
                     .getMessage("weather.already.exists.message",null, Locale.getDefault()));
         }
         this.weatherRepository.saveWeather(regionName, newWeatherDTO);
-        return this.findWeatherListByRegionAndCurrentDay(regionName);
+        return this.findById(this.getIdByRegionName(regionName));
     }
 
     @Override
