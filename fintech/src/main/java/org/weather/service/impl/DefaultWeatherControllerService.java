@@ -4,6 +4,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.context.MessageSource;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
+import org.weather.dto.ExternalWeatherApiResponseDTO;
 import org.weather.dto.WeatherDTO;
 import org.weather.entity.Weather;
 import org.weather.exception.WeatherAlreadyExistsException;
@@ -22,7 +24,11 @@ import java.util.UUID;
 public class DefaultWeatherControllerService implements WeatherControllerService {
     private final WeatherRepository weatherRepository;
     private final MessageSource messageSource;
-
+    private final RestTemplate restTemplate;
+    private final String weatherAlreadyExistsMessageName = "weather.already.exists.message";
+    private final String weatherNotFoundMessageName = "weather.not.found.message";
+    private final String weatherApiKey = "57ca5d93a8584509b18115355230310";
+    private final String weatherApiUrlPath = "https://api.weatherapi.com/v1/current.json";
     @Override
     public Map<String, List<Weather>> findAll() {
         return weatherRepository.findAll();
@@ -52,7 +58,7 @@ public class DefaultWeatherControllerService implements WeatherControllerService
         if(id != null && this.weatherRepository
                 .hasWeatherWithSameIdAndDate(id, newWeatherDTO.getDateTime())) {
             throw new WeatherAlreadyExistsException(HttpStatus.BAD_REQUEST, messageSource
-                    .getMessage("weather.already.exists.message",null, Locale.getDefault()));
+                    .getMessage(weatherAlreadyExistsMessageName,null, Locale.getDefault()));
         }
         this.weatherRepository.saveWeather(regionName, newWeatherDTO);
         return this.findById(this.getIdByRegionName(regionName));
@@ -83,8 +89,15 @@ public class DefaultWeatherControllerService implements WeatherControllerService
         UUID id = this.getIdByRegionName(regionName);
         if(id == null) {
             throw new WeatherNotFoundException(HttpStatus.NOT_FOUND, messageSource
-                    .getMessage("weather.not.found.message",null,Locale.getDefault()));
+                    .getMessage(weatherNotFoundMessageName,null,Locale.getDefault()));
         }
         return id;
+    }
+
+    @Override
+    public double getTemperatureFromExternalApi(String regionName) {
+        String finalPath = weatherApiUrlPath + "?key=" + weatherApiKey + "&q=" + regionName + "&aqi=no";
+        ExternalWeatherApiResponseDTO weatherApiResponseDTO = this.restTemplate.getForObject(finalPath, ExternalWeatherApiResponseDTO.class);
+        return weatherApiResponseDTO.getCurrent().getTemperatureInCelsius();
     }
 }
