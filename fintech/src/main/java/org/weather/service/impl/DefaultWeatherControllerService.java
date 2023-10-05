@@ -5,7 +5,7 @@ import org.springframework.context.MessageSource;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
-import org.weather.dto.ExternalWeatherApiResponseDTO;
+import org.weather.dto.WeatherApiDTO;
 import org.weather.dto.WeatherDTO;
 import org.weather.entity.Weather;
 import org.weather.exception.WeatherAlreadyExistsException;
@@ -27,8 +27,7 @@ public class DefaultWeatherControllerService implements WeatherControllerService
     private final RestTemplate restTemplate;
     private final String weatherAlreadyExistsMessageName = "weather.already.exists.message";
     private final String weatherNotFoundMessageName = "weather.not.found.message";
-    private final String weatherApiKey = "57ca5d93a8584509b18115355230310";
-    private final String weatherApiUrlPath = "https://api.weatherapi.com/v1/current.json";
+
     @Override
     public Map<String, List<Weather>> findAll() {
         return weatherRepository.findAll();
@@ -95,9 +94,7 @@ public class DefaultWeatherControllerService implements WeatherControllerService
     }
 
     @Override
-    public double getTemperatureFromExternalApi(String regionName) {
-        String finalPath = weatherApiUrlPath + "?key=" + weatherApiKey + "&q=" + regionName + "&aqi=no";
-        ExternalWeatherApiResponseDTO weatherApiResponseDTO = this.restTemplate.getForObject(finalPath, ExternalWeatherApiResponseDTO.class);
-        return weatherApiResponseDTO.getCurrent().getTemperatureInCelsius();
+    public double getTemperatureFromExternalApi(WeatherApiDTO weatherApiDTO) {
+        return weatherApiDTO.getCurrent().getTemperatureInCelsius();
     }
 }
