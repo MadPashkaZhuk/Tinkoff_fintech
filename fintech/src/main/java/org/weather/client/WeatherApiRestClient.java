@@ -10,6 +10,7 @@ import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 import org.weather.dto.WeatherApiDTO;
+import org.weather.dto.WeatherApiErrorDTO;
 import org.weather.exception.weatherapi.WeatherApiDisabledKeyException;
 import org.weather.exception.weatherapi.WeatherApiIncorrectQueryException;
 import org.weather.exception.weatherapi.WeatherApiUnknownException;
@@ -25,6 +26,7 @@ public class WeatherApiRestClient {
     private final String weatherApiWrongKeyMessage = "weatherapi.wrong.key.message";
     private final String weatherApiDisabledKeyMessage = "weatherapi.disabled.key.message";
     private final String weatherApiUnknownExceptionMessage = "weatherapi.unknown.exception.message";
+    private final int unknownErrorCode;
     private final RestTemplate restTemplate;
     private final MessageSource messageSource;
     private final String weatherApiKey;
@@ -32,12 +34,14 @@ public class WeatherApiRestClient {
 
     public WeatherApiRestClient(DefaultWeatherControllerService weatherControllerService, RestTemplate restTemplate,
                                 MessageSource messageSource, @Value("${weather.api.key}") String weatherApiKey,
-                                @Value("${weather.api.url}") String weatherApiUrlPath) {
+                                @Value("${weather.api.url}") String weatherApiUrlPath,
+                                @Value("${weather.api.unknown.error.code}") int unknownErrorCode) {
         this.weatherControllerService = weatherControllerService;
         this.restTemplate = restTemplate;
         this.messageSource = messageSource;
         this.weatherApiKey = weatherApiKey;
         this.weatherApiUrlPath = weatherApiUrlPath;
+        this.unknownErrorCode = unknownErrorCode;
     }
 
     public double getTemperatureFromWeatherApi(String regionName) {
@@ -55,20 +59,22 @@ public class WeatherApiRestClient {
             );
             return this.weatherControllerService.getTemperatureFromExternalApi(responseEntity.getBody());
         } catch (HttpStatusCodeException ex) {
+            WeatherApiErrorDTO weatherApiErrorDTO = ex.getResponseBodyAs(WeatherApiErrorDTO.class);
+            int errorCode = weatherApiErrorDTO.getError().getCode();
             if(ex.getStatusCode() == HttpStatus.BAD_REQUEST) {
                 throw new WeatherApiIncorrectQueryException(HttpStatus.BAD_REQUEST, messageSource
-                        .getMessage(weatherApiInvalidUrlMessage, null, Locale.getDefault()), 1);
+                        .getMessage(weatherApiInvalidUrlMessage, null, Locale.getDefault()), errorCode);
             }
             if(ex.getStatusCode() == HttpStatus.UNAUTHORIZED) {
                 throw new WeatherApiWrongKeyException(HttpStatus.UNAUTHORIZED, messageSource
-                        .getMessage(weatherApiWrongKeyMessage, null, Locale.getDefault()), 1);
+                        .getMessage(weatherApiWrongKeyMessage, null, Locale.getDefault()), errorCode);
             }
             if(ex.getStatusCode() == HttpStatus.FORBIDDEN) {
                 throw new WeatherApiDisabledKeyException(HttpStatus.FORBIDDEN, messageSource
-                        .getMessage(weatherApiDisabledKeyMessage, null, Locale.getDefault()), 1);
+                        .getMessage(weatherApiDisabledKeyMessage, null, Locale.getDefault()), errorCode);
             }
         }
         throw new WeatherApiUnknownException(HttpStatus.REQUEST_TIMEOUT, messageSource
-                .getMessage(weatherApiUnknownExceptionMessage, null, Locale.getDefault()), 1);
+                .getMessage(weatherApiUnknownExceptionMessage, null, Locale.getDefault()), unknownErrorCode);
     }
 }

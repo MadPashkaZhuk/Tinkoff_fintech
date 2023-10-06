@@ -5,7 +5,7 @@ import io.github.resilience4j.ratelimiter.annotation.RateLimiter;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.MessageSource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,11 +19,19 @@ import org.weather.exception.weatherapi.WeatherApiTooManyRequests;
 import java.util.Locale;
 
 @Controller
-@RequiredArgsConstructor
 @RequestMapping("/external/weatherapi")
 public class weatherApiController {
     private final WeatherApiRestClient weatherApiRestClient;
     private final MessageSource messageSource;
+    private final int tooManyRequestsErrorCode;
+
+    public weatherApiController(WeatherApiRestClient weatherApiRestClient,
+                                MessageSource messageSource,
+                                @Value("${weather.api.too.many.requests.code}") int tooManyRequestsErrorCode) {
+        this.weatherApiRestClient = weatherApiRestClient;
+        this.messageSource = messageSource;
+        this.tooManyRequestsErrorCode = tooManyRequestsErrorCode;
+    }
 
     @Operation(summary = "Get temperature from weatherapi.com",
             description = "Get temperature from weatherapi.com by region name provided")
@@ -32,13 +40,14 @@ public class weatherApiController {
     })
     @GetMapping("/{regionName}")
     @RateLimiter(name = "weatherApiCurrent", fallbackMethod = "fallbackMethod")
-    public ResponseEntity<?> handleExternalGetTemperature(@PathVariable("regionName") String regionName) {
+    public ResponseEntity<?> handleGetTemperature(@PathVariable("regionName") String regionName) {
         return ResponseEntity.ok()
                 .body(this.weatherApiRestClient.getTemperatureFromWeatherApi(regionName));
     }
 
     public ResponseEntity<?> fallbackMethod(RequestNotPermitted requestNotPermitted) {
         throw new WeatherApiTooManyRequests(HttpStatus.TOO_MANY_REQUESTS, messageSource
-                .getMessage("weatherapi.too.many.requests.message", null, Locale.getDefault()), 7777);
+                .getMessage("weatherapi.too.many.requests.message", null, Locale.getDefault()),
+                tooManyRequestsErrorCode);
     }
 }

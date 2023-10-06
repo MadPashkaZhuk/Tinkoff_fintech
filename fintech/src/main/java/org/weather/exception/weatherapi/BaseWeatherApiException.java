@@ -5,10 +5,14 @@ import org.springframework.http.HttpStatus;
 import org.weather.exception.BaseWeatherException;
 
 @Getter
-public class BaseWeatherApiException extends BaseWeatherException {
+public class BaseWeatherApiException extends RuntimeException {
     private final int errorCode;
+    private final HttpStatus status;
+    private final String exceptionMessage;
     public BaseWeatherApiException(HttpStatus status, String exceptionMessage, int errorCode) {
-        super(status, exceptionMessage);
+        super(exceptionMessage);
+        this.exceptionMessage = exceptionMessage;
+        this.status = status;
         this.errorCode = errorCode;
     }
 }
