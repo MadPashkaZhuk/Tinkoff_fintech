@@ -18,9 +18,9 @@ import java.util.Map;
 public class ApplicationExceptionHandler {
     @ExceptionHandler(BaseWeatherApiException.class)
     public ResponseEntity<BaseWeatherApiExceptionDTO> handleBaseWeatherApiException(BaseWeatherApiException ex) {
-        BaseWeatherApiExceptionDTO baseExceptionDTO =
+        BaseWeatherApiExceptionDTO baseWeatherApiExceptionDTO =
                 new BaseWeatherApiExceptionDTO(ex.getStatus(), ex.getExceptionMessage(), ex.getErrorCode());
-        return new ResponseEntity<>(baseExceptionDTO, ex.getStatus());
+        return new ResponseEntity<>(baseWeatherApiExceptionDTO, ex.getStatus());
     }
 
     @ExceptionHandler(BaseWeatherException.class)
