@@ -7,7 +7,7 @@ import org.springframework.http.HttpStatus;
 @Value
 public class BaseWeatherApiExceptionDTO {
     @Schema(name = "Status", requiredMode = Schema.RequiredMode.REQUIRED,
-            description = "Status for thrown exception", example = "404")
+            description = "Status for thrown exception", example = "HttpStatus.NOT_FOUND")
     HttpStatus status;
     @Schema(name = "Exception message", requiredMode = Schema.RequiredMode.REQUIRED,
             description = "Message for thrown exception", example = "Page doesn't exist")

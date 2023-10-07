@@ -1,5 +1,6 @@
 package org.weather.client;
 
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.MessageSource;
 import org.springframework.http.HttpMethod;
@@ -32,8 +33,10 @@ public class WeatherApiRestClient {
     private final String weatherApiKey;
     private final String weatherApiUrlPath;
 
-    public WeatherApiRestClient(DefaultWeatherControllerService weatherControllerService, RestTemplate restTemplate,
-                                MessageSource messageSource, @Value("${weather.api.key}") String weatherApiKey,
+    public WeatherApiRestClient(DefaultWeatherControllerService weatherControllerService,
+                                @Qualifier("WeatherApiRestTemplate") RestTemplate restTemplate,
+                                MessageSource messageSource,
+                                @Value("${weather.api.key}") String weatherApiKey,
                                 @Value("${weather.api.url}") String weatherApiUrlPath,
                                 @Value("${weather.api.unknown.error.code}") int unknownErrorCode) {
         this.weatherControllerService = weatherControllerService;
@@ -45,36 +48,48 @@ public class WeatherApiRestClient {
     }
 
     public double getTemperatureFromWeatherApi(String regionName) {
+        ResponseEntity<WeatherApiDTO> responseEntity = null;
         String finalPath = UriComponentsBuilder.fromUriString(weatherApiUrlPath)
                 .queryParam("key", weatherApiKey)
                 .queryParam("q", regionName)
                 .queryParam("aqi", "no")
                 .toUriString();
         try {
-            ResponseEntity<WeatherApiDTO> responseEntity = restTemplate.exchange(
+            responseEntity = restTemplate.exchange(
                     finalPath,
                     HttpMethod.GET,
                     null,
                     WeatherApiDTO.class
             );
-            return this.weatherControllerService.getTemperatureFromExternalApi(responseEntity.getBody());
+            WeatherApiDTO weatherApiDTO = responseEntity.getBody();
+            return this.weatherControllerService.getTemperatureFromWeatherApi(weatherApiDTO);
         } catch (HttpStatusCodeException ex) {
             WeatherApiErrorDTO weatherApiErrorDTO = ex.getResponseBodyAs(WeatherApiErrorDTO.class);
             int errorCode = weatherApiErrorDTO.getError().getCode();
             if(ex.getStatusCode() == HttpStatus.BAD_REQUEST) {
-                throw new WeatherApiIncorrectQueryException(HttpStatus.BAD_REQUEST, messageSource
-                        .getMessage(weatherApiInvalidUrlMessage, null, Locale.getDefault()), errorCode);
+                throw new WeatherApiIncorrectQueryException(HttpStatus.BAD_REQUEST,
+                        getMessageFromMessageSource(weatherApiInvalidUrlMessage), errorCode);
             }
             if(ex.getStatusCode() == HttpStatus.UNAUTHORIZED) {
-                throw new WeatherApiWrongKeyException(HttpStatus.UNAUTHORIZED, messageSource
-                        .getMessage(weatherApiWrongKeyMessage, null, Locale.getDefault()), errorCode);
+                throw new WeatherApiWrongKeyException(HttpStatus.UNAUTHORIZED,
+                        getMessageFromMessageSource(weatherApiWrongKeyMessage), errorCode);
             }
             if(ex.getStatusCode() == HttpStatus.FORBIDDEN) {
-                throw new WeatherApiDisabledKeyException(HttpStatus.FORBIDDEN, messageSource
-                        .getMessage(weatherApiDisabledKeyMessage, null, Locale.getDefault()), errorCode);
+                throw new WeatherApiDisabledKeyException(HttpStatus.FORBIDDEN,
+                        getMessageFromMessageSource(weatherApiDisabledKeyMessage), errorCode);
             }
+            else {
+                throw new WeatherApiUnknownException(HttpStatus.REQUEST_TIMEOUT,
+                        getMessageFromMessageSource(weatherApiUnknownExceptionMessage), unknownErrorCode);
+            }
+        } catch (Throwable ex) {
+            throw new WeatherApiUnknownException(HttpStatus.REQUEST_TIMEOUT,
+                    getMessageFromMessageSource(weatherApiUnknownExceptionMessage), unknownErrorCode);
         }
-        throw new WeatherApiUnknownException(HttpStatus.REQUEST_TIMEOUT, messageSource
-                .getMessage(weatherApiUnknownExceptionMessage, null, Locale.getDefault()), unknownErrorCode);
+    }
+
+    private String getMessageFromMessageSource(String messageCode) {
+        return messageSource.getMessage(messageCode, null, Locale.getDefault());
     }
 }
+

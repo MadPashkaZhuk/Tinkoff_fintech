@@ -16,5 +16,5 @@ public interface WeatherControllerService {
     List<Weather> createNewWeather(String regionName, WeatherDTO newWeatherDTO);
     List<Weather> updateWeatherTemperature(String regionName, WeatherDTO newWeatherDTO);
     List<Weather> findWeatherListByRegionAndCurrentDay(String regionName);
-    double getTemperatureFromExternalApi(WeatherApiDTO weatherApiDTO);
+    double getTemperatureFromWeatherApi(WeatherApiDTO weatherApiDTO);
 }

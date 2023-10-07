@@ -36,6 +36,8 @@ public class ApplicationExceptionHandler {
         exception.getBindingResult().getFieldErrors().forEach(x -> errors.put(x.getField(), x.getDefaultMessage()));
         return errors;
     }
+
+
     @ExceptionHandler(Throwable.class)
     public ResponseEntity<BaseExceptionDTO> handleUnexpectedExceptions(Throwable exception) {
         BaseExceptionDTO baseExceptionDTO =

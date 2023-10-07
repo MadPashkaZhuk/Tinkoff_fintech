@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.context.MessageSource;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
 import org.weather.dto.WeatherApiDTO;
 import org.weather.dto.WeatherDTO;
 import org.weather.entity.Weather;
@@ -24,7 +23,6 @@ import java.util.UUID;
 public class DefaultWeatherControllerService implements WeatherControllerService {
     private final WeatherRepository weatherRepository;
     private final MessageSource messageSource;
-    private final RestTemplate restTemplate;
     private final String weatherAlreadyExistsMessageName = "weather.already.exists.message";
     private final String weatherNotFoundMessageName = "weather.not.found.message";
 
@@ -94,7 +92,7 @@ public class DefaultWeatherControllerService implements WeatherControllerService
     }
 
     @Override
-    public double getTemperatureFromExternalApi(WeatherApiDTO weatherApiDTO) {
+    public double getTemperatureFromWeatherApi(WeatherApiDTO weatherApiDTO) {
         return weatherApiDTO.getCurrent().getTemperatureInCelsius();
     }
 }
