@@ -1,7 +1,6 @@
 package org.weather.service.impl;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.context.MessageSource;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.weather.dto.WeatherApiDTO;
@@ -11,10 +10,11 @@ import org.weather.exception.WeatherAlreadyExistsException;
 import org.weather.exception.WeatherNotFoundException;
 import org.weather.repository.WeatherRepository;
 import org.weather.service.WeatherControllerService;
+import org.weather.utils.MessageSourceWrapper;
+import org.weather.utils.enums.WeatherMessageEnum;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
 
@@ -22,9 +22,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class DefaultWeatherControllerService implements WeatherControllerService {
     private final WeatherRepository weatherRepository;
-    private final MessageSource messageSource;
-    private final String weatherAlreadyExistsMessageName = "weather.already.exists.message";
-    private final String weatherNotFoundMessageName = "weather.not.found.message";
+    private final MessageSourceWrapper messageSource;
 
     @Override
     public Map<String, List<Weather>> findAll() {
@@ -54,8 +52,8 @@ public class DefaultWeatherControllerService implements WeatherControllerService
         UUID id = this.getIdByRegionName(regionName);
         if(id != null && this.weatherRepository
                 .hasWeatherWithSameIdAndDate(id, newWeatherDTO.getDateTime())) {
-            throw new WeatherAlreadyExistsException(HttpStatus.BAD_REQUEST, messageSource
-                    .getMessage(weatherAlreadyExistsMessageName,null, Locale.getDefault()));
+            throw new WeatherAlreadyExistsException(HttpStatus.BAD_REQUEST,
+                    messageSource.getMessageCode(WeatherMessageEnum.WEATHER_ALREADY_EXISTS));
         }
         this.weatherRepository.saveWeather(regionName, newWeatherDTO);
         return this.findById(this.getIdByRegionName(regionName));
@@ -85,8 +83,8 @@ public class DefaultWeatherControllerService implements WeatherControllerService
     public UUID getValidatedIdByRegionName(String regionName) {
         UUID id = this.getIdByRegionName(regionName);
         if(id == null) {
-            throw new WeatherNotFoundException(HttpStatus.NOT_FOUND, messageSource
-                    .getMessage(weatherNotFoundMessageName,null,Locale.getDefault()));
+            throw new WeatherNotFoundException(HttpStatus.NOT_FOUND,
+                    messageSource.getMessageCode(WeatherMessageEnum.REGION_NOT_FOUND));
         }
         return id;
     }
