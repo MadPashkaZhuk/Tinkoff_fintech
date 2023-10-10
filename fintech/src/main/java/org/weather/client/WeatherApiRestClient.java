@@ -1,9 +1,7 @@
 package org.weather.client;
 
 import io.github.resilience4j.ratelimiter.annotation.RateLimiter;
-import lombok.Setter;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,31 +19,30 @@ import org.weather.utils.enums.ErrorCodeEnum;
 import org.weather.utils.enums.WeatherMessageEnum;
 
 @Component
-@Setter
-@ConfigurationProperties(prefix = "weather.api")
 public class WeatherApiRestClient {
     private final DefaultWeatherControllerService weatherControllerService;
     private final RestTemplate restTemplate;
     private final MessageSourceWrapper messageSource;
     private final ErrorCodeHelper errorCodeHelper;
-    private String key;
-    private String url;
+    private final ClientProperties clientProperties;
 
     public WeatherApiRestClient(DefaultWeatherControllerService weatherControllerService,
                                 @Qualifier("WeatherApiRestTemplate") RestTemplate restTemplate,
                                 MessageSourceWrapper messageSource,
-                                ErrorCodeHelper errorCodeHelper) {
+                                ErrorCodeHelper errorCodeHelper,
+                                ClientProperties clientProperties) {
         this.weatherControllerService = weatherControllerService;
         this.restTemplate = restTemplate;
         this.messageSource = messageSource;
         this.errorCodeHelper = errorCodeHelper;
+        this.clientProperties = clientProperties;
     }
 
     @RateLimiter(name = "weatherApiCurrent")
     public double getTemperatureFromWeatherApi(String regionName) {
         ResponseEntity<WeatherApiDTO> responseEntity;
-        String finalPath = UriComponentsBuilder.fromUriString(url)
-                .queryParam("key", key)
+        String finalPath = UriComponentsBuilder.fromUriString(clientProperties.getUrl())
+                .queryParam("key", clientProperties.getKey())
                 .queryParam("q", regionName)
                 .queryParam("aqi", "no")
                 .toUriString();
@@ -61,7 +58,7 @@ public class WeatherApiRestClient {
         } catch (HttpStatusCodeException ex) {
             throw getWeatherApiExceptionFromHttpException(ex);
         } catch (Throwable ex) {
-            throw new WeatherApiUnknownException(HttpStatus.REQUEST_TIMEOUT,
+            throw new WeatherApiUnknownException(HttpStatus.INTERNAL_SERVER_ERROR,
                     messageSource.getMessageCode(WeatherMessageEnum.UNKNOWN_EXCEPTION),
                     errorCodeHelper.getCode(ErrorCodeEnum.UNKNOWN_ERROR_CODE));
         }
@@ -81,7 +78,7 @@ public class WeatherApiRestClient {
             exception = new WeatherApiDisabledKeyException(HttpStatus.FORBIDDEN,
                     messageSource.getMessageCode(WeatherMessageEnum.API_KEY_DISABLED), errorCode);
         } else {
-            exception = new WeatherApiUnknownException(HttpStatus.REQUEST_TIMEOUT,
+            exception = new WeatherApiUnknownException(HttpStatus.INTERNAL_SERVER_ERROR,
                     messageSource.getMessageCode(WeatherMessageEnum.UNKNOWN_EXCEPTION), errorCode);
         }
         return exception;
