@@ -41,6 +41,7 @@ public class WeatherApiRestClient {
     @RateLimiter(name = "weatherApiCurrent")
     public double getTemperatureFromWeatherApi(String regionName) {
         ResponseEntity<WeatherApiDTO> responseEntity;
+        System.out.println(clientProperties.getKey());
         String finalPath = UriComponentsBuilder.fromUriString(clientProperties.getUrl())
                 .queryParam("key", clientProperties.getKey())
                 .queryParam("q", regionName)
