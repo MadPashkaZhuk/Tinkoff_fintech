@@ -1,13 +1,13 @@
-package org.weather.exception;
+package org.weather.exception.city;
 
 import lombok.Getter;
 import org.springframework.http.HttpStatus;
 
 @Getter
-public class BaseWeatherException extends RuntimeException{
+public class BaseCityException extends RuntimeException{
     private final HttpStatus status;
     private final String exceptionMessage;
-    public BaseWeatherException(HttpStatus status, String exceptionMessage) {
+    public BaseCityException(HttpStatus status, String exceptionMessage) {
         super(exceptionMessage);
         this.exceptionMessage = exceptionMessage;
         this.status = status;

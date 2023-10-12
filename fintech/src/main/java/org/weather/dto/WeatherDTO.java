@@ -1,18 +1,16 @@
 package org.weather.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.constraints.NotNull;
-import lombok.Value;
+import lombok.Data;
 
 import java.time.LocalDateTime;
 
-@Value
+@Data
 public class WeatherDTO {
-    @Schema(name = "Temperature", requiredMode = Schema.RequiredMode.REQUIRED,
-            description = "Double temperature value, no restrictions for range", example = "100")
-    double temperatureValue;
-    @NotNull(message = "Date and time can't be null")
-    @Schema(type = "string", name = "Weather Date and Time", requiredMode = Schema.RequiredMode.REQUIRED,
-            description = "Weather date info", example = "2023-09-28T14:30:00")
+    @Schema(name = "temperature", requiredMode = Schema.RequiredMode.REQUIRED,
+            description = "Current temperature", example = "18.3")
+    double temp_val;
+    @Schema(name = "dateTime", requiredMode = Schema.RequiredMode.REQUIRED,
+            description = "Info about date and time", example = "2023-10-28T14:30:00")
     LocalDateTime dateTime;
 }

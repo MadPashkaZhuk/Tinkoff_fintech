@@ -1,4 +1,4 @@
-package org.weather.client;
+/*package org.weather.client;
 
 import io.github.resilience4j.ratelimiter.annotation.RateLimiter;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -9,10 +9,10 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
-import org.weather.dto.WeatherApiDTO;
-import org.weather.dto.WeatherApiErrorDTO;
+import org.weather.dto.weatherapi.WeatherApiDTO;
+import org.weather.dto.weatherapi.WeatherApiErrorDTO;
 import org.weather.exception.weatherapi.*;
-import org.weather.service.impl.DefaultWeatherControllerService;
+import org.weather.service.garbage.DefaultWeatherControllerService;
 import org.weather.utils.ErrorCodeHelper;
 import org.weather.utils.MessageSourceWrapper;
 import org.weather.utils.enums.ErrorCodeEnum;
@@ -85,4 +85,4 @@ public class WeatherApiRestClient {
         return exception;
     }
 }
-
+*/

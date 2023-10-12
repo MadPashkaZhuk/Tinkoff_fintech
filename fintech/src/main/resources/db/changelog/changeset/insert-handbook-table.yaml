@@ -1,0 +1,67 @@
+databaseChangeLog:
+  - changeSet:
+      id: insert-handbook
+      author: Paul
+      changes:
+        -  insert:
+             columns:
+               -  column:
+                    name: type
+                    value: sunshine
+             tableName: handbook
+
+        - insert:
+            columns:
+              - column:
+                  name: type
+                  value: cloudy
+            tableName: handbook
+
+        - insert:
+            columns:
+              - column:
+                  name: type
+                  value: partly cloudy
+            tableName: handbook
+
+        - insert:
+            columns:
+              - column:
+                  name: type
+                  value: raining
+            tableName: handbook
+
+        - insert:
+            columns:
+              - column:
+                  name: type
+                  value: snowing
+            tableName: handbook
+
+        - insert:
+            columns:
+              - column:
+                  name: type
+                  value: overcast
+            tableName: handbook
+
+        - insert:
+            columns:
+              - column:
+                  name: type
+                  value: foggy
+            tableName: handbook
+
+        - insert:
+            columns:
+              - column:
+                  name: type
+                  value: thunder&lightning
+            tableName: handbook
+
+        - insert:
+            columns:
+              - column:
+                  name: type
+                  value: windy
+            tableName: handbook

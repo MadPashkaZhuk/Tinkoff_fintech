@@ -1,4 +1,4 @@
-package org.weather.controller;
+/*package org.weather.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -34,3 +34,4 @@ public class WeatherApiController {
                 .body(this.weatherApiRestClient.getTemperatureFromWeatherApi(regionName));
     }
 }
+*/

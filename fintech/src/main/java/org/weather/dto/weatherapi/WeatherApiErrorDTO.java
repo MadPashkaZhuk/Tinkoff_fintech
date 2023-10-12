@@ -1,4 +1,4 @@
-package org.weather.dto;
+package org.weather.dto.weatherapi;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;

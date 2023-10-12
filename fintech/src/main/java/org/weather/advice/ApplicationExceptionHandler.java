@@ -7,8 +7,9 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.weather.dto.BaseExceptionDTO;
-import org.weather.dto.BaseWeatherApiExceptionDTO;
-import org.weather.exception.BaseWeatherException;
+import org.weather.dto.weatherapi.BaseWeatherApiExceptionDTO;
+import org.weather.exception.city.BaseCityException;
+import org.weather.exception.weather.BaseWeatherException;
 import org.weather.exception.weatherapi.BaseWeatherApiException;
 
 import java.util.HashMap;
@@ -24,7 +25,13 @@ public class ApplicationExceptionHandler {
     }
 
     @ExceptionHandler(BaseWeatherException.class)
-    public ResponseEntity<BaseExceptionDTO> handleBaseException(BaseWeatherException ex) {
+    public ResponseEntity<BaseExceptionDTO> handleBaseWeatherException(BaseWeatherException ex) {
+        BaseExceptionDTO baseExceptionDTO = new BaseExceptionDTO(ex.getStatus(), ex.getExceptionMessage());
+        return new ResponseEntity<>(baseExceptionDTO, ex.getStatus());
+    }
+
+    @ExceptionHandler(BaseCityException.class)
+    public ResponseEntity<BaseExceptionDTO> handleBaseCityException(BaseCityException ex) {
         BaseExceptionDTO baseExceptionDTO = new BaseExceptionDTO(ex.getStatus(), ex.getExceptionMessage());
         return new ResponseEntity<>(baseExceptionDTO, ex.getStatus());
     }
@@ -36,7 +43,6 @@ public class ApplicationExceptionHandler {
         exception.getBindingResult().getFieldErrors().forEach(x -> errors.put(x.getField(), x.getDefaultMessage()));
         return errors;
     }
-
 
     @ExceptionHandler(Throwable.class)
     public ResponseEntity<BaseExceptionDTO> handleUnexpectedExceptions(Throwable exception) {

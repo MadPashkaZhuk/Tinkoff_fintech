@@ -1,17 +1,15 @@
-package org.weather.exception.weatherapi;
+package org.weather.exception.weather;
 
 import lombok.Getter;
 import org.springframework.http.HttpStatus;
 
 @Getter
-public class BaseWeatherApiException extends RuntimeException {
-    private final int errorCode;
+public class BaseWeatherException extends RuntimeException{
     private final HttpStatus status;
     private final String exceptionMessage;
-    public BaseWeatherApiException(HttpStatus status, String exceptionMessage, int errorCode) {
+    public BaseWeatherException(HttpStatus status, String exceptionMessage) {
         super(exceptionMessage);
         this.exceptionMessage = exceptionMessage;
         this.status = status;
-        this.errorCode = errorCode;
     }
 }

@@ -10,7 +10,9 @@ public enum WeatherMessageEnum {
     API_KEY_DISABLED("weatherapi.disabled.key.message"),
     INVALID_URL("weatherapi.invalid.url.message"),
     UNKNOWN_EXCEPTION("weatherapi.unknown.exception.message"),
-    TOO_MANY_REQUESTS("weatherapi.too.many.requests.message");
+    TOO_MANY_REQUESTS("weatherapi.too.many.requests.message"),
+    CITY_NOT_FOUND("city.not.found.message"),
+    CITY_ALREADY_EXISTS("city.already.exists.message");
 
     private final String code;
     WeatherMessageEnum(String code) {
