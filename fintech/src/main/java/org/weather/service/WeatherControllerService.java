@@ -1,5 +1,6 @@
 package org.weather.service;
 
+import org.weather.dto.WeatherApiDTO;
 import org.weather.dto.WeatherDTO;
 import org.weather.entity.Weather;
 
@@ -15,4 +16,5 @@ public interface WeatherControllerService {
     List<Weather> createNewWeather(String regionName, WeatherDTO newWeatherDTO);
     List<Weather> updateWeatherTemperature(String regionName, WeatherDTO newWeatherDTO);
     List<Weather> findWeatherListByRegionAndCurrentDay(String regionName);
+    double getTemperatureFromWeatherApi(WeatherApiDTO weatherApiDTO);
 }

@@ -7,7 +7,6 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Value
-@Schema
 public class Weather {
     @Schema(name = "Weather ID", requiredMode = Schema.RequiredMode.REQUIRED,
             description = "Unique identifier", example = "7f1e514f-8ccc-4817-b6ee-c362250cffda")
