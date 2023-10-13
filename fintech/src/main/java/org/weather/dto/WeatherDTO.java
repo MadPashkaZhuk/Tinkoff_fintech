@@ -1,6 +1,7 @@
 package org.weather.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 import java.time.LocalDateTime;
@@ -12,5 +13,8 @@ public class WeatherDTO {
     double temp_val;
     @Schema(name = "dateTime", requiredMode = Schema.RequiredMode.REQUIRED,
             description = "Info about date and time", example = "2023-10-28T14:30:00")
+    @NotNull(message = "Date and time can't be null")
     LocalDateTime dateTime;
+
+    Integer handbook_id;
 }

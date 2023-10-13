@@ -35,9 +35,15 @@ public class Weather {
             description = "Weather date info", example = "2023-09-28T14:30:00")
     private LocalDateTime datetime;
 
-    public Weather(double temp_c, City city, LocalDateTime datetime) {
+    @ManyToOne
+    @Schema(name = "Handbook", requiredMode = Schema.RequiredMode.REQUIRED,
+            description = "Handbook type, there are 9 of them", example = "sunshine")
+    private Handbook handbook;
+
+    public Weather(double temp_c, City city, LocalDateTime datetime, Handbook handbook) {
         this.temp_c = temp_c;
         this.city = city;
         this.datetime = datetime;
+        this.handbook = handbook;
     }
 }

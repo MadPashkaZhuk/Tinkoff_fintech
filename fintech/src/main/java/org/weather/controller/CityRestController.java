@@ -62,8 +62,7 @@ public class CityRestController {
     @Operation(summary = "Delete city in database",
             description = "Delete all city and weather connected to this city.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "204", description = "City deleted successfully"),
-            @ApiResponse(responseCode = "404", description = "City provided doesn't exist")
+            @ApiResponse(responseCode = "204", description = "City deleted successfully")
     })
     @DeleteMapping("/{cityName}")
     public ResponseEntity<?> deleteCity(@PathVariable("cityName") String cityName) {

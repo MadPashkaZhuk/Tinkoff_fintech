@@ -25,16 +25,15 @@ databaseChangeLog:
                     foreignKeyName: city_weather_fk
                     referencedTableName: city
                     referencedColumnNames: id
-#              - column:
-#                  name: handbook_id
-#                  type: bigint
-#                  constraints:
-#                    foreignKeyName: handbook_weather_fk
-#                    referencedTableName: handbook
-#                    referencedColumnNames: id
+              - column:
+                  name: handbook_id
+                  type: bigint
+                  constraints:
+                    foreignKeyName: handbook_weather_fk
+                    referencedTableName: handbook
+                    referencedColumnNames: id
               - column:
                   name: date_time
                   type: datetime
                   constraints:
                     nullable: false
-

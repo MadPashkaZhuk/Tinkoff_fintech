@@ -47,7 +47,18 @@ public class CityService {
 
     @Transactional
     public void deleteCity(String cityName) {
-        weatherService.deleteAll(cityName);
-        cityRepository.deleteCityByName(cityName);
+        if(cityRepository.getCityByName(cityName) != null) {
+            weatherService.deleteAll(cityName);
+            cityRepository.deleteCityByName(cityName);
+        }
+    }
+
+    public City getCityByNameOrThrowException(String cityName) {
+        City city = cityRepository.getCityByName(cityName);
+        if(city == null) {
+            throw new CityNotFoundException(HttpStatus.NOT_FOUND,
+                    messageSourceWrapper.getMessageCode(WeatherMessageEnum.CITY_NOT_FOUND));
+        }
+        return city;
     }
 }

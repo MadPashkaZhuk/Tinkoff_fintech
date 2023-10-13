@@ -12,7 +12,8 @@ public enum WeatherMessageEnum {
     UNKNOWN_EXCEPTION("weatherapi.unknown.exception.message"),
     TOO_MANY_REQUESTS("weatherapi.too.many.requests.message"),
     CITY_NOT_FOUND("city.not.found.message"),
-    CITY_ALREADY_EXISTS("city.already.exists.message");
+    CITY_ALREADY_EXISTS("city.already.exists.message"),
+    HANDBOOK_NOT_FOUND("handbook.not.found.message");
 
     private final String code;
     WeatherMessageEnum(String code) {

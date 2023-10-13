@@ -8,10 +8,10 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.weather.dto.BaseExceptionDTO;
 import org.weather.dto.weatherapi.BaseWeatherApiExceptionDTO;
-import org.weather.exception.city.BaseCityException;
-import org.weather.exception.weather.BaseWeatherException;
+import org.weather.exception.BaseEntityException;
 import org.weather.exception.weatherapi.BaseWeatherApiException;
 
+import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -24,15 +24,9 @@ public class ApplicationExceptionHandler {
         return new ResponseEntity<>(baseWeatherApiExceptionDTO, ex.getStatus());
     }
 
-    @ExceptionHandler(BaseWeatherException.class)
-    public ResponseEntity<BaseExceptionDTO> handleBaseWeatherException(BaseWeatherException ex) {
-        BaseExceptionDTO baseExceptionDTO = new BaseExceptionDTO(ex.getStatus(), ex.getExceptionMessage());
-        return new ResponseEntity<>(baseExceptionDTO, ex.getStatus());
-    }
-
-    @ExceptionHandler(BaseCityException.class)
-    public ResponseEntity<BaseExceptionDTO> handleBaseCityException(BaseCityException ex) {
-        BaseExceptionDTO baseExceptionDTO = new BaseExceptionDTO(ex.getStatus(), ex.getExceptionMessage());
+    @ExceptionHandler(BaseEntityException.class)
+    public ResponseEntity<BaseExceptionDTO> handleBaseWeatherException(BaseEntityException ex) {
+        BaseExceptionDTO baseExceptionDTO = new BaseExceptionDTO(ex.getStatus(), ex.getMessage());
         return new ResponseEntity<>(baseExceptionDTO, ex.getStatus());
     }
 
@@ -42,6 +36,12 @@ public class ApplicationExceptionHandler {
         Map<String, String> errors = new HashMap<>();
         exception.getBindingResult().getFieldErrors().forEach(x -> errors.put(x.getField(), x.getDefaultMessage()));
         return errors;
+    }
+
+    @ExceptionHandler(SQLException.class)
+    public ResponseEntity<BaseExceptionDTO> handleBaseWeatherException(SQLException ex) {
+        BaseExceptionDTO baseExceptionDTO = new BaseExceptionDTO(HttpStatus.INTERNAL_SERVER_ERROR, ex.getMessage());
+        return new ResponseEntity<>(baseExceptionDTO, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     @ExceptionHandler(Throwable.class)
