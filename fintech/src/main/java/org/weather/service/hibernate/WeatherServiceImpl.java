@@ -1,6 +1,8 @@
 package org.weather.service.hibernate;
 
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.context.annotation.Primary;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -9,26 +11,29 @@ import org.weather.entity.City;
 import org.weather.entity.Handbook;
 import org.weather.entity.Weather;
 import org.weather.exception.weather.WeatherNotFoundException;
-import org.weather.repository.hibernate.WeatherRepository;
+import org.weather.repository.WeatherRepository;
+import org.weather.service.WeatherService;
 import org.weather.utils.MessageSourceWrapper;
 import org.weather.utils.enums.WeatherMessageEnum;
 
 import java.util.List;
 
 @Service
-public class WeatherService {
+@Primary
+@ConditionalOnProperty(value = "hibernate.enable", havingValue = "true")
+public class WeatherServiceImpl implements WeatherService {
     private final WeatherRepository weatherRepository;
-    private final CityService cityService;
-    private final HandbookService handbookService;
+    private final CityServiceImpl cityServiceImpl;
+    private final HandbookServiceImpl handbookServiceImpl;
     private final MessageSourceWrapper messageSourceWrapper;
 
-    public WeatherService(WeatherRepository weatherRepository,
-                          @Lazy CityService cityService,
-                          HandbookService handbookService,
-                          MessageSourceWrapper messageSourceWrapper) {
+    public WeatherServiceImpl(WeatherRepository weatherRepository,
+                              @Lazy CityServiceImpl cityServiceImpl,
+                              HandbookServiceImpl handbookServiceImpl,
+                              MessageSourceWrapper messageSourceWrapper) {
         this.weatherRepository = weatherRepository;
-        this.cityService = cityService;
-        this.handbookService = handbookService;
+        this.cityServiceImpl = cityServiceImpl;
+        this.handbookServiceImpl = handbookServiceImpl;
         this.messageSourceWrapper = messageSourceWrapper;
     }
 
@@ -89,10 +94,10 @@ public class WeatherService {
     }
 
     private City getCityByName(String cityName) {
-        return cityService.getCityByNameOrThrowException(cityName);
+        return cityServiceImpl.getCityByNameOrThrowException(cityName);
     }
 
     private Handbook getHandbookById(Integer handbook_id) {
-        return handbookService.findById(handbook_id);
+        return handbookServiceImpl.findById(handbook_id);
     }
 }

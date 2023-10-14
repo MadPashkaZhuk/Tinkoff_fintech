@@ -4,23 +4,24 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 import org.weather.dto.CityDTO;
 import org.weather.entity.City;
-import org.weather.service.hibernate.CityService;
+import org.weather.service.CityService;
 
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
 @RestController
-@RequiredArgsConstructor
 @RequestMapping("/cities")
+@RequiredArgsConstructor
 public class CityRestController {
-    private final CityService cityService;
+    private final CityService cityServiceImpl;
 
     @Operation(summary = "Show all city info")
     @ApiResponses(value = {
@@ -30,7 +31,7 @@ public class CityRestController {
     public ResponseEntity<List<City>> getCities() {
         return ResponseEntity.ok()
                 .contentType(MediaType.APPLICATION_JSON)
-                .body(cityService.findAll());
+                .body(cityServiceImpl.findAll());
     }
 
     @Operation(summary = "Get city by id")
@@ -42,7 +43,7 @@ public class CityRestController {
     public ResponseEntity<City> getCityById(@PathVariable("id") UUID id) {
         return ResponseEntity.ok()
                 .contentType(MediaType.APPLICATION_JSON)
-                .body(cityService.findCityById(id));
+                .body(cityServiceImpl.findCityById(id));
     }
 
     @Operation(summary = "Add new city")
@@ -57,7 +58,7 @@ public class CityRestController {
                         .path("/city/{cityName}")
                         .build(Map.of("cityName", cityName)))
                 .contentType(MediaType.APPLICATION_JSON)
-                .body(cityService.save(cityName));
+                .body(cityServiceImpl.save(cityName));
     }
 
     @Operation(summary = "Update city in database",
@@ -74,7 +75,7 @@ public class CityRestController {
                     .path("/city/{cityName}")
                     .build(Map.of("cityName", cityName)))
                 .contentType(MediaType.APPLICATION_JSON)
-                .body(cityService.updateCityByName(cityName, cityDTO));
+                .body(cityServiceImpl.update(cityName, cityDTO));
 
     }
     @Operation(summary = "Delete city in database",
@@ -84,7 +85,7 @@ public class CityRestController {
     })
     @DeleteMapping("/{cityName}")
     public ResponseEntity<?> deleteCity(@PathVariable("cityName") String cityName) {
-        this.cityService.deleteCity(cityName);
+        this.cityServiceImpl.delete(cityName);
         return ResponseEntity.noContent()
                 .build();
     }

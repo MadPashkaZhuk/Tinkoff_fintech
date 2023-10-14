@@ -10,16 +10,16 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 import org.weather.dto.WeatherDTO;
 import org.weather.entity.Weather;
-import org.weather.service.hibernate.WeatherService;
+import org.weather.service.WeatherService;
 
 import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequiredArgsConstructor
 @RequestMapping("/weather")
+@RequiredArgsConstructor
 public class WeatherRestController {
-    private final WeatherService weatherService;
+    private final WeatherService weatherServiceImpl;
 
     @Operation(summary = "Get all weather in database")
     @ApiResponses(value = {
@@ -28,7 +28,7 @@ public class WeatherRestController {
     @GetMapping
     ResponseEntity<List<Weather>> getAllWeather() {
         return ResponseEntity.ok()
-                .body(weatherService.findAll());
+                .body(weatherServiceImpl.findAll());
     }
 
     @Operation(summary = "Get all weather info by city's name")
@@ -40,7 +40,7 @@ public class WeatherRestController {
     ResponseEntity<?> getAllWeatherForCity(@PathVariable("cityName") String cityName) {
         return ResponseEntity.ok()
                 .contentType(MediaType.APPLICATION_JSON)
-                .body(weatherService.getWeatherForCity(cityName));
+                .body(weatherServiceImpl.getWeatherForCity(cityName));
     }
 
     @Operation(summary = "Add new weather data for specific city")
@@ -56,7 +56,7 @@ public class WeatherRestController {
                         .path("/weather/{cityName}")
                         .build(Map.of("cityName", cityName)))
                 .contentType(MediaType.APPLICATION_JSON)
-                .body(weatherService.saveWeatherForCity(cityName, weatherDTO));
+                .body(weatherServiceImpl.saveWeatherForCity(cityName, weatherDTO));
     }
 
     @Operation(summary = "Delete weather info by specific dateTime")
@@ -66,7 +66,7 @@ public class WeatherRestController {
     @DeleteMapping("/{cityName}")
     ResponseEntity<?> deleteWeatherForCityByDateTime(@PathVariable("cityName") String cityName,
                                                      @RequestBody WeatherDTO weatherDTO) {
-        weatherService.deleteWeatherByDateTime(cityName, weatherDTO);
+        weatherServiceImpl.deleteWeatherByDateTime(cityName, weatherDTO);
         return ResponseEntity.noContent()
                 .build();
     }
@@ -84,6 +84,6 @@ public class WeatherRestController {
                         .path("/weather/{cityName}")
                         .build(Map.of("cityName", cityName)))
                 .contentType(MediaType.APPLICATION_JSON)
-                .body(weatherService.updateWeatherForCity(cityName, weatherDTO));
+                .body(weatherServiceImpl.updateWeatherForCity(cityName, weatherDTO));
     }
 }

@@ -1,4 +1,4 @@
-package org.weather.repository.hibernate;
+package org.weather.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.weather.entity.Handbook;
