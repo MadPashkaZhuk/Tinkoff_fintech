@@ -17,7 +17,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/handbook")
 @RequiredArgsConstructor
-public class HandbookController {
+public class HandbookRestController {
     private final HandbookService handbookService;
 
     @GetMapping

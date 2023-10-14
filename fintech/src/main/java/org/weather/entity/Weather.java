@@ -2,8 +2,7 @@ package org.weather.entity;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.hibernate.annotations.UuidGenerator;
 
 import java.time.LocalDateTime;
@@ -11,7 +10,10 @@ import java.util.UUID;
 
 @Entity
 @Table(name = "weather")
-@Getter
+//@Getter
+//@Setter
+@Data
+
 @NoArgsConstructor
 public class Weather {
     @Id

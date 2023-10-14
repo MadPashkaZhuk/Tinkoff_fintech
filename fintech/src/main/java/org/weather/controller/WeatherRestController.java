@@ -18,7 +18,7 @@ import java.util.Map;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/weather")
-public class WeatherController {
+public class WeatherRestController {
     private final WeatherService weatherService;
 
     @Operation(summary = "Get all weather in database")
@@ -69,5 +69,21 @@ public class WeatherController {
         weatherService.deleteWeatherByDateTime(cityName, weatherDTO);
         return ResponseEntity.noContent()
                 .build();
+    }
+
+    @Operation(summary = "Delete weather info by specific dateTime")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "Weather data updated successfully"),
+            @ApiResponse(responseCode = "404", description = "City provided doesn't exist")
+    })
+    @PutMapping("/{cityName}")
+    ResponseEntity<?> updateWeatherForCityByDateTime(@PathVariable("cityName") String cityName,
+                                                     @RequestBody WeatherDTO weatherDTO,
+                                                     UriComponentsBuilder uriComponentsBuilder) {
+        return ResponseEntity.created(uriComponentsBuilder
+                        .path("/weather/{cityName}")
+                        .build(Map.of("cityName", cityName)))
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(weatherService.updateWeatherForCity(cityName, weatherDTO));
     }
 }

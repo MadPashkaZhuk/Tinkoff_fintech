@@ -1,9 +1,10 @@
 package org.weather.service.hibernate;
 
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.weather.dto.CityDTO;
 import org.weather.entity.City;
 import org.weather.exception.city.CityAlreadyExistsException;
 import org.weather.exception.city.CityNotFoundException;
@@ -60,5 +61,12 @@ public class CityService {
                     messageSourceWrapper.getMessageCode(WeatherMessageEnum.CITY_NOT_FOUND));
         }
         return city;
+    }
+    @Transactional
+    public City updateCityByName(String cityName, CityDTO cityDTO) {
+        City existingCity = this.getCityByNameOrThrowException(cityName);
+        cityRepository.updateCityNameById(existingCity.getId(), cityDTO.getNewName());
+        existingCity = cityRepository.getCityByName(cityName);
+        return existingCity;
     }
 }

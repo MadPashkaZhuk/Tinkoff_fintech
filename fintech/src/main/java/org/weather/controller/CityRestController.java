@@ -8,6 +8,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
+import org.weather.dto.CityDTO;
 import org.weather.entity.City;
 import org.weather.service.hibernate.CityService;
 
@@ -59,6 +60,23 @@ public class CityRestController {
                 .body(cityService.save(cityName));
     }
 
+    @Operation(summary = "Update city in database",
+            description = "Update city name in database.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "City updated successfully"),
+            @ApiResponse(responseCode = "404", description = "City provided doesn't exist")
+    })
+    @PutMapping("/{cityName}")
+    public ResponseEntity<City> updateCity(@PathVariable("cityName") String cityName,
+                                           @RequestBody CityDTO cityDTO,
+                                           UriComponentsBuilder uriComponentsBuilder) {
+        return ResponseEntity.created(uriComponentsBuilder
+                    .path("/city/{cityName}")
+                    .build(Map.of("cityName", cityName)))
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(cityService.updateCityByName(cityName, cityDTO));
+
+    }
     @Operation(summary = "Delete city in database",
             description = "Delete all city and weather connected to this city.")
     @ApiResponses(value = {

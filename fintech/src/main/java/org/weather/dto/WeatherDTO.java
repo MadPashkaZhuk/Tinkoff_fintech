@@ -15,6 +15,8 @@ public class WeatherDTO {
             description = "Info about date and time", example = "2023-10-28T14:30:00")
     @NotNull(message = "Date and time can't be null")
     LocalDateTime dateTime;
-
+    @Schema(name = "dateTime", requiredMode = Schema.RequiredMode.REQUIRED,
+            description = "Id of handbook type", example = "3")
+    @NotNull(message = "handbook_id can't be null")
     Integer handbook_id;
 }

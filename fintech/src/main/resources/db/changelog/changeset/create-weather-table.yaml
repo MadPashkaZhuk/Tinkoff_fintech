@@ -15,7 +15,7 @@ databaseChangeLog:
                     nullable: false
               - column:
                   name: temperature
-                  type: int
+                  type: double
                   constraints:
                     nullable: false
               - column:
