@@ -1,10 +1,11 @@
 package org.weather.dto.weatherapi;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.Data;
+import lombok.Value;
 
-@Data
+@Value
 public class WeatherApiDTO {
     @Schema(name = "Location", requiredMode = Schema.RequiredMode.REQUIRED,
             description = "Contains info about Location name and local time")
@@ -16,20 +17,28 @@ public class WeatherApiDTO {
             description = "Contains info about error thrown: code and message")
     Error error;
 
-    @Data
+    @Value
     public static class Location {
         String name;
         String localtime;
+        @JsonCreator
+        public Location(@JsonProperty("name") String name, @JsonProperty("localtime") String localtime) {
+            this.name = name;
+            this.localtime = localtime;
+        }
     }
-    @Data
+    @Value
     public static class Current {
-        @JsonProperty("temp_c")
         double temperatureInCelsius;
+        @JsonCreator
+        public Current(@JsonProperty("temp_c") double temperatureInCelsius) {
+            this.temperatureInCelsius = temperatureInCelsius;
+        }
     }
 
-    @Data
+    @Value
     public static class Error {
-        private int code;
-        private String message;
+        int code;
+        String message;
     }
 }

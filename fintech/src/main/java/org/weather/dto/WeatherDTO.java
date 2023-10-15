@@ -2,11 +2,11 @@ package org.weather.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
-import lombok.Data;
+import lombok.Value;
 
 import java.time.LocalDateTime;
 
-@Data
+@Value
 public class WeatherDTO {
     @Schema(name = "temperature", requiredMode = Schema.RequiredMode.REQUIRED,
             description = "Current temperature", example = "18.3")

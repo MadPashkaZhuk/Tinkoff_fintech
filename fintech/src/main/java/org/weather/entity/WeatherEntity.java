@@ -12,7 +12,6 @@ import java.util.UUID;
 @Table(name = "weather")
 @AllArgsConstructor
 @Data
-
 @NoArgsConstructor
 public class WeatherEntity {
     @Id
