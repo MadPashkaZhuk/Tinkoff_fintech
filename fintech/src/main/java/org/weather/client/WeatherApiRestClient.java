@@ -10,10 +10,9 @@ import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 import org.weather.dto.weatherapi.WeatherApiDTO;
-import org.weather.dto.weatherapi.WeatherApiErrorDTO;
 import org.weather.exception.weatherapi.*;
 import org.weather.properties.ClientProperties;
-import org.weather.service.WeatherApiService;
+import org.weather.utils.WeatherApiMapper;
 import org.weather.utils.ErrorCodeHelper;
 import org.weather.utils.MessageSourceWrapper;
 import org.weather.utils.enums.ErrorCodeEnum;
@@ -21,18 +20,18 @@ import org.weather.utils.enums.WeatherMessageEnum;
 
 @Component
 public class WeatherApiRestClient {
-    private final WeatherApiService weatherApiService;
+    private final WeatherApiMapper weatherApiMapper;
     private final RestTemplate restTemplate;
     private final MessageSourceWrapper messageSource;
     private final ErrorCodeHelper errorCodeHelper;
     private final ClientProperties clientProperties;
 
-    public WeatherApiRestClient(WeatherApiService weatherApiService,
+    public WeatherApiRestClient(WeatherApiMapper weatherApiMapper,
                                 @Qualifier("WeatherApiRestTemplate") RestTemplate restTemplate,
                                 MessageSourceWrapper messageSource,
                                 ErrorCodeHelper errorCodeHelper,
                                 ClientProperties clientProperties) {
-        this.weatherApiService = weatherApiService;
+        this.weatherApiMapper = weatherApiMapper;
         this.restTemplate = restTemplate;
         this.messageSource = messageSource;
         this.errorCodeHelper = errorCodeHelper;
@@ -56,7 +55,7 @@ public class WeatherApiRestClient {
                     WeatherApiDTO.class
             );
             WeatherApiDTO weatherApiDTO = responseEntity.getBody();
-            return weatherApiService.getTemperatureFromWeatherApi(weatherApiDTO);
+            return weatherApiMapper.getTemperatureFromWeatherApi(weatherApiDTO);
         } catch (HttpStatusCodeException ex) {
             throw getWeatherApiExceptionFromHttpException(ex);
         } catch (Throwable ex) {
@@ -67,21 +66,23 @@ public class WeatherApiRestClient {
     }
 
     private BaseWeatherApiException getWeatherApiExceptionFromHttpException(HttpStatusCodeException ex) {
-        WeatherApiErrorDTO weatherApiErrorDTO = ex.getResponseBodyAs(WeatherApiErrorDTO.class);
-        int errorCode = weatherApiErrorDTO.getError().getCode();
         BaseWeatherApiException exception;
         if(ex.getStatusCode() == HttpStatus.BAD_REQUEST) {
             exception = new WeatherApiIncorrectQueryException(HttpStatus.BAD_REQUEST,
-                    messageSource.getMessageCode(WeatherMessageEnum.INVALID_URL), errorCode);
+                    messageSource.getMessageCode(WeatherMessageEnum.INVALID_URL),
+                    errorCodeHelper.getCode(ErrorCodeEnum.INVALID_URL));
         } else if(ex.getStatusCode() == HttpStatus.UNAUTHORIZED) {
             exception = new WeatherApiWrongKeyException(HttpStatus.UNAUTHORIZED,
-                    messageSource.getMessageCode(WeatherMessageEnum.API_KEY_INVALID), errorCode);
+                    messageSource.getMessageCode(WeatherMessageEnum.API_KEY_INVALID),
+                    errorCodeHelper.getCode(ErrorCodeEnum.API_KEY_INVALID));
         } else if(ex.getStatusCode() == HttpStatus.FORBIDDEN) {
             exception = new WeatherApiDisabledKeyException(HttpStatus.FORBIDDEN,
-                    messageSource.getMessageCode(WeatherMessageEnum.API_KEY_DISABLED), errorCode);
+                    messageSource.getMessageCode(WeatherMessageEnum.API_KEY_DISABLED),
+                    errorCodeHelper.getCode(ErrorCodeEnum.API_KEY_DISABLED));
         } else {
             exception = new WeatherApiUnknownException(HttpStatus.INTERNAL_SERVER_ERROR,
-                    messageSource.getMessageCode(WeatherMessageEnum.UNKNOWN_EXCEPTION), errorCode);
+                    messageSource.getMessageCode(WeatherMessageEnum.UNKNOWN_EXCEPTION),
+                    errorCodeHelper.getCode(ErrorCodeEnum.UNKNOWN_ERROR_CODE));
         }
         return exception;
     }

@@ -45,6 +45,18 @@ public class CityRestController {
                 .body(cityServiceImpl.findCityById(id));
     }
 
+    @Operation(summary = "Get city by name")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "City data retrieved successfully"),
+            @ApiResponse(responseCode = "404", description = "City with this id doesn't exist in database")
+    })
+    @GetMapping("/name/{cityName}")
+    public ResponseEntity<CityEntity> getCityByName(@PathVariable("cityName") String cityName) {
+        return ResponseEntity.ok()
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(cityServiceImpl.findCityByName(cityName));
+    }
+
     @Operation(summary = "Add new city")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "New city created successfully"),
@@ -54,7 +66,7 @@ public class CityRestController {
     public ResponseEntity<CityEntity> saveCity(@PathVariable("cityName") String cityName,
                                                UriComponentsBuilder uriComponentsBuilder) {
         return ResponseEntity.created(uriComponentsBuilder
-                        .path("/city/{cityName}")
+                        .path("/cities/name/{cityName}")
                         .build(Map.of("cityName", cityName)))
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(cityServiceImpl.save(cityName));
@@ -63,16 +75,15 @@ public class CityRestController {
     @Operation(summary = "Update city in database",
             description = "Update city name in database.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "201", description = "City updated successfully"),
-            @ApiResponse(responseCode = "404", description = "City provided doesn't exist")
+            @ApiResponse(responseCode = "201", description = "City updated successfully")
     })
     @PutMapping("/{cityName}")
     public ResponseEntity<CityEntity> updateCity(@PathVariable("cityName") String cityName,
                                                  @RequestBody CityDTO cityDTO,
                                                  UriComponentsBuilder uriComponentsBuilder) {
         return ResponseEntity.created(uriComponentsBuilder
-                    .path("/city/{cityName}")
-                    .build(Map.of("cityName", cityName)))
+                    .path("/cities/name/{cityName}")
+                    .build(Map.of("cityName", cityDTO.getNewName())))
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(cityServiceImpl.update(cityName, cityDTO));
 

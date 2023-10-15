@@ -121,4 +121,10 @@ public class WeatherServiceJdbcImpl implements WeatherService {
     private CityEntity getCityById(UUID cityId) {
         return cityService.findCityById(cityId);
     }
+
+    public void deleteAllByCityName(String cityName) {
+        final String deleteWeatherByDateTimeQuery = "DELETE FROM weather WHERE city_id = ?";
+        CityEntity city = getCityByName(cityName);
+        jdbcTemplate.update(deleteWeatherByDateTimeQuery, city.getId());
+    }
 }

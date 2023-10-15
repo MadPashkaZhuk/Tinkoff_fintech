@@ -1,10 +1,10 @@
-package org.weather.service;
+package org.weather.utils;
 
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 import org.weather.dto.weatherapi.WeatherApiDTO;
 
-@Service
-public class WeatherApiService {
+@Component
+public class WeatherApiMapper {
     public double getTemperatureFromWeatherApi(WeatherApiDTO weatherApiDTO) {
         return weatherApiDTO.getCurrent().getTemperatureInCelsius();
     }

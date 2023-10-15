@@ -30,7 +30,7 @@ public class CityServiceImpl implements CityService {
     }
 
     public CityEntity save(String cityName) {
-        if(cityRepository.getCityByName(cityName) != null) {
+        if(hasCityWithName(cityName)) {
             throw new CityAlreadyExistsException(HttpStatus.BAD_REQUEST,
                     messageSourceWrapper.getMessageCode(WeatherMessageEnum.CITY_ALREADY_EXISTS));
         }
@@ -54,30 +54,43 @@ public class CityServiceImpl implements CityService {
 
     @Transactional
     public void delete(String cityName) {
-        if(cityRepository.getCityByName(cityName) != null) {
+        if(hasCityWithName(cityName)) {
             weatherServiceImpl.deleteAll(cityName);
             cityRepository.deleteCityByName(cityName);
         }
     }
 
     public CityEntity getCityByNameOrThrowException(String cityName) {
-        CityEntity city = this.findCityByName(cityName);
-        if(city == null) {
+        if(!hasCityWithName(cityName)) {
             throw new CityNotFoundException(HttpStatus.NOT_FOUND,
                     messageSourceWrapper.getMessageCode(WeatherMessageEnum.CITY_NOT_FOUND));
         }
-        return city;
+        return getCityByName(cityName);
     }
     @Transactional
     public CityEntity update(String cityName, CityDTO cityDTO) {
-        CityEntity existingCity = this.getCityByNameOrThrowException(cityName);
-        cityRepository.updateCityNameById(existingCity.getId(), cityDTO.getNewName());
-        existingCity = cityRepository.getCityByName(cityName);
-        return existingCity;
+        CityEntity city = getCityByName(cityName);
+        if(hasCityWithName(cityDTO.getNewName())) {
+            delete(cityName);
+            return getCityByName(cityDTO.getNewName());
+        }
+        if (city == null) {
+            return save(cityDTO.getNewName());
+        }
+        cityRepository.updateCityNameById(city.getId(), cityDTO.getNewName());
+        city.setName(cityDTO.getNewName());
+        return city;
+    }
+
+    private CityEntity getCityByName(String cityName) {
+        return cityRepository.getCityByName(cityName);
     }
 
     @Override
     public CityEntity findCityByName(String cityName) {
-        return cityRepository.getCityByName(cityName);
+        return getCityByNameOrThrowException(cityName);
+    }
+    private boolean hasCityWithName(String cityName) {
+        return cityRepository.getCityByName(cityName) != null;
     }
 }

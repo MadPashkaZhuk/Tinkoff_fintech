@@ -36,12 +36,12 @@ public class WeatherServiceImpl implements WeatherService {
     }
 
     public List<WeatherEntity> getWeatherForCity(String cityName) {
-        CityEntity city = getCityByName(cityName);
+        CityEntity city = getCityByNameFromRepo(cityName);
         return weatherRepository.findWeatherByCity(city);
     }
 
     public WeatherEntity saveWeatherForCity(String cityName, WeatherDTO newWeatherData) {
-        CityEntity city = getCityByName(cityName);
+        CityEntity city = getCityByNameFromRepo(cityName);
         if(weatherRepository.getWeatherByCityAndDatetime(city, newWeatherData.getDateTime()) != null) {
             throw new WeatherNotFoundException(HttpStatus.BAD_REQUEST,
                     messageSourceWrapper.getMessageCode(WeatherMessageEnum.WEATHER_ALREADY_EXISTS));
@@ -56,14 +56,14 @@ public class WeatherServiceImpl implements WeatherService {
 
     @Transactional
     public void deleteWeatherByDateTime(String cityName, WeatherDTO weatherToDelete) {
-        CityEntity city = getCityByName(cityName);
+        CityEntity city = getCityByNameFromRepo(cityName);
         weatherRepository.deleteWeatherByCityAndDatetime(city,
                 weatherToDelete.getDateTime());
     }
 
     @Transactional
     public void deleteAll(String cityName){
-        CityEntity city = getCityByName(cityName);
+        CityEntity city = getCityByNameFromRepo(cityName);
         weatherRepository.deleteAllByCity(city);
     }
 
@@ -73,7 +73,7 @@ public class WeatherServiceImpl implements WeatherService {
 
     @Transactional
     public WeatherEntity updateWeatherForCity(String cityName, WeatherDTO newWeatherData) {
-        CityEntity city = getCityByName(cityName);
+        CityEntity city = getCityByNameFromRepo(cityName);
         WeatherEntity currentWeather = weatherRepository.getWeatherByCityAndDatetime(city, newWeatherData.getDateTime());
         if (currentWeather == null) {
             return saveWeatherForCity(cityName, newWeatherData);
@@ -91,7 +91,7 @@ public class WeatherServiceImpl implements WeatherService {
         return currentWeather;
     }
 
-    private CityEntity getCityByName(String cityName) {
+    private CityEntity getCityByNameFromRepo(String cityName) {
         return cityServiceImpl.getCityByNameOrThrowException(cityName);
     }
 
