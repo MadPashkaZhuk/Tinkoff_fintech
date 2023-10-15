@@ -3,7 +3,6 @@ package org.weather.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -16,9 +15,12 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/handbook")
-@RequiredArgsConstructor
 public class HandbookRestController {
-    private final HandbookService handbookServiceImpl;
+    private final HandbookService handbookService;
+
+    public HandbookRestController(HandbookService handbookService) {
+        this.handbookService = handbookService;
+    }
 
     @GetMapping
     @Operation(summary = "Get all handbook types",
@@ -28,7 +30,7 @@ public class HandbookRestController {
     })
     ResponseEntity<List<HandbookEntity>> getAllHandbookTypes() {
         return ResponseEntity.ok()
-                .body(handbookServiceImpl.findAll());
+                .body(handbookService.findAll());
     }
     @Operation(summary = "Get handbook type by id")
     @ApiResponses(value = {
@@ -38,6 +40,6 @@ public class HandbookRestController {
     @GetMapping("/{id}")
     ResponseEntity<HandbookEntity> getHandbookTypeById(@PathVariable("id") Integer id) {
         return ResponseEntity.ok()
-                .body(handbookServiceImpl.findById(id));
+                .body(handbookService.findById(id));
     }
 }

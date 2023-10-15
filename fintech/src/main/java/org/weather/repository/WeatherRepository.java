@@ -16,7 +16,6 @@ import java.util.List;
 import java.util.UUID;
 
 @Repository
-@ConditionalOnProperty(value = "hibernate.enable", havingValue = "true")
 public interface WeatherRepository extends JpaRepository<WeatherEntity, UUID> {
     List<WeatherEntity> findWeatherByCity(CityEntity city);
     @Modifying

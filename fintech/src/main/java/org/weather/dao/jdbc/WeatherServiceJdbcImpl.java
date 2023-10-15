@@ -1,10 +1,7 @@
 package org.weather.dao.jdbc;
 
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.stereotype.Service;
 import org.weather.dto.WeatherDTO;
 import org.weather.entity.CityEntity;
 import org.weather.entity.HandbookEntity;
@@ -21,15 +18,12 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
-@Service
-@ConditionalOnProperty(value = "hibernate.enable", havingValue = "false")
 public class WeatherServiceJdbcImpl implements WeatherService {
     private final JdbcTemplate jdbcTemplate;
     private final CityService cityService;
     private final HandbookService handbookService;
-    public WeatherServiceJdbcImpl(DataSource dataSource,
-                                  @Qualifier("cityServiceJdbcImpl") @Lazy CityService cityService,
-                                  @Qualifier("handbookServiceJdbcImpl")HandbookService handbookService) {
+    public WeatherServiceJdbcImpl(DataSource dataSource, @Lazy CityService cityService,
+                                  HandbookService handbookService) {
         this.jdbcTemplate = new JdbcTemplate(dataSource);
         this.cityService = cityService;
         this.handbookService = handbookService;

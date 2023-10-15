@@ -1,8 +1,6 @@
 package org.weather.dao.hibernate;
 
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.HttpStatus;
-import org.springframework.stereotype.Service;
 import org.weather.entity.HandbookEntity;
 import org.weather.exception.handbook.HandbookTypeNotFoundException;
 import org.weather.repository.HandbookRepository;
@@ -13,8 +11,6 @@ import org.weather.utils.enums.WeatherMessageEnum;
 import java.util.List;
 import java.util.Optional;
 
-@Service
-@ConditionalOnProperty(value = "hibernate.enable", havingValue = "true")
 public class HandbookServiceImpl implements HandbookService {
     private final HandbookRepository handbookRepository;
     private final MessageSourceWrapper messageSourceWrapper;

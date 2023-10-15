@@ -1,9 +1,7 @@
 package org.weather.dao.jdbc;
 
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.HttpStatus;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.stereotype.Service;
 import org.weather.dto.CityDTO;
 import org.weather.entity.CityEntity;
 import org.weather.exception.city.CityAlreadyExistsException;
@@ -16,8 +14,6 @@ import javax.sql.DataSource;
 import java.util.List;
 import java.util.UUID;
 
-@Service
-@ConditionalOnProperty(value = "hibernate.enable", havingValue = "false")
 public class CityServiceJdbcImpl implements CityService {
     private final JdbcTemplate jdbcTemplate;
     private final MessageSourceWrapper messageSourceWrapper;

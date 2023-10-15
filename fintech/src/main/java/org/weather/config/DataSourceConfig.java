@@ -2,14 +2,12 @@ package org.weather.config;
 
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.weather.properties.JdbcDataSourceProperties;
 
 import javax.sql.DataSource;
 
-@ConditionalOnProperty(value = "hibernate.enable", havingValue = "false")
 @Configuration
 public class DataSourceConfig {
     private final JdbcDataSourceProperties jdbcDataSourceProperties;

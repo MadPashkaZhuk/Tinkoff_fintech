@@ -3,7 +3,6 @@ package org.weather.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -17,9 +16,12 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/weather")
-@RequiredArgsConstructor
 public class WeatherRestController {
-    private final WeatherService weatherServiceImpl;
+    private final WeatherService weatherService;
+
+    public WeatherRestController(WeatherService weatherService) {
+        this.weatherService = weatherService;
+    }
 
     @Operation(summary = "Get all weather in database")
     @ApiResponses(value = {
@@ -28,7 +30,7 @@ public class WeatherRestController {
     @GetMapping
     ResponseEntity<List<WeatherEntity>> getAllWeather() {
         return ResponseEntity.ok()
-                .body(weatherServiceImpl.findAll());
+                .body(weatherService.findAll());
     }
 
     @Operation(summary = "Get all weather info by city's name")
@@ -40,7 +42,7 @@ public class WeatherRestController {
     ResponseEntity<?> getAllWeatherForCity(@PathVariable("cityName") String cityName) {
         return ResponseEntity.ok()
                 .contentType(MediaType.APPLICATION_JSON)
-                .body(weatherServiceImpl.getWeatherForCity(cityName));
+                .body(weatherService.getWeatherForCity(cityName));
     }
 
     @Operation(summary = "Add new weather data for specific city")
@@ -56,7 +58,7 @@ public class WeatherRestController {
                         .path("/weather/{cityName}")
                         .build(Map.of("cityName", cityName)))
                 .contentType(MediaType.APPLICATION_JSON)
-                .body(weatherServiceImpl.saveWeatherForCity(cityName, weatherDTO));
+                .body(weatherService.saveWeatherForCity(cityName, weatherDTO));
     }
 
     @Operation(summary = "Delete weather info by specific dateTime")
@@ -66,7 +68,7 @@ public class WeatherRestController {
     @DeleteMapping("/{cityName}")
     ResponseEntity<?> deleteWeatherForCityByDateTime(@PathVariable("cityName") String cityName,
                                                      @RequestBody WeatherDTO weatherDTO) {
-        weatherServiceImpl.deleteWeatherByDateTime(cityName, weatherDTO);
+        weatherService.deleteWeatherByDateTime(cityName, weatherDTO);
         return ResponseEntity.noContent()
                 .build();
     }
@@ -84,6 +86,6 @@ public class WeatherRestController {
                         .path("/weather/{cityName}")
                         .build(Map.of("cityName", cityName)))
                 .contentType(MediaType.APPLICATION_JSON)
-                .body(weatherServiceImpl.updateWeatherForCity(cityName, weatherDTO));
+                .body(weatherService.updateWeatherForCity(cityName, weatherDTO));
     }
 }

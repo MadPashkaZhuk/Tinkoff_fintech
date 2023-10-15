@@ -1,9 +1,7 @@
 package org.weather.dao.hibernate;
 
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.http.HttpStatus;
-import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.weather.dto.WeatherDTO;
 import org.weather.entity.CityEntity;
@@ -17,8 +15,6 @@ import org.weather.utils.enums.WeatherMessageEnum;
 
 import java.util.List;
 
-@Service
-@ConditionalOnProperty(value = "hibernate.enable", havingValue = "true")
 public class WeatherServiceImpl implements WeatherService {
     private final WeatherRepository weatherRepository;
     private final CityServiceImpl cityServiceImpl;

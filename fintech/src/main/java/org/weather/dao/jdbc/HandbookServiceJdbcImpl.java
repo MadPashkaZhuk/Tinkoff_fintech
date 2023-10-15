@@ -1,16 +1,12 @@
 package org.weather.dao.jdbc;
 
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.stereotype.Service;
 import org.weather.entity.HandbookEntity;
 import org.weather.service.HandbookService;
 
 import javax.sql.DataSource;
 import java.util.List;
 
-@Service
-@ConditionalOnProperty(value = "hibernate.enable", havingValue = "false")
 public class HandbookServiceJdbcImpl implements HandbookService {
     private final JdbcTemplate jdbcTemplate;
 
