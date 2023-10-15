@@ -11,7 +11,6 @@ import org.weather.dto.weatherapi.BaseWeatherApiExceptionDTO;
 import org.weather.exception.BaseEntityException;
 import org.weather.exception.weatherapi.BaseWeatherApiException;
 
-import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -36,12 +35,6 @@ public class ApplicationExceptionHandler {
         Map<String, String> errors = new HashMap<>();
         exception.getBindingResult().getFieldErrors().forEach(x -> errors.put(x.getField(), x.getDefaultMessage()));
         return errors;
-    }
-
-    @ExceptionHandler(SQLException.class)
-    public ResponseEntity<BaseExceptionDTO> handleBaseWeatherException(SQLException ex) {
-        BaseExceptionDTO baseExceptionDTO = new BaseExceptionDTO(HttpStatus.INTERNAL_SERVER_ERROR, ex.getMessage());
-        return new ResponseEntity<>(baseExceptionDTO, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     @ExceptionHandler(Throwable.class)

@@ -1,11 +1,13 @@
 package org.weather.dao.jdbc;
 
 import org.springframework.context.annotation.Lazy;
+import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.weather.dto.WeatherDTO;
 import org.weather.entity.CityEntity;
 import org.weather.entity.HandbookEntity;
 import org.weather.entity.WeatherEntity;
+import org.weather.exception.sql.WeatherSqlException;
 import org.weather.service.CityService;
 import org.weather.service.HandbookService;
 import org.weather.service.WeatherService;
@@ -31,18 +33,26 @@ public class WeatherServiceJdbcImpl implements WeatherService {
     @Override
     public List<WeatherEntity> findAll() {
         final String findAllQuery = "SELECT * FROM weather";
-        return jdbcTemplate.query(findAllQuery, (rs, rowNum) -> mapWeather(rs));
+        try {
+            return jdbcTemplate.query(findAllQuery, (rs, rowNum) -> mapWeather(rs));
+        } catch (DataAccessException exception) {
+            throw new WeatherSqlException(exception.getMessage());
+        }
     }
 
     @Override
     public List<WeatherEntity> getWeatherForCity(String cityName) {
         CityEntity city = getCityByName(cityName);
         final String findAllWeatherForCityQuery = "SELECT * FROM weather WHERE city_id = ?";
-        return jdbcTemplate.query(
-                findAllWeatherForCityQuery,
-                (rs, rowNum) -> mapWeather(rs),
-                city.getId()
-        );
+        try {
+            return jdbcTemplate.query(
+                    findAllWeatherForCityQuery,
+                    (rs, rowNum) -> mapWeather(rs),
+                    city.getId()
+            );
+        } catch (DataAccessException exception) {
+            throw new WeatherSqlException(exception.getMessage());
+        }
     }
 
     @Override
@@ -51,17 +61,25 @@ public class WeatherServiceJdbcImpl implements WeatherService {
         HandbookEntity handbook = getHandbookById(weatherDTO.getHandbook_id());
         CityEntity city = getCityByName(cityName);
         UUID newId = UUID.randomUUID();
-        jdbcTemplate.update(insertWeatherQuery, newId, weatherDTO.getTemp_val(), city.getId(),
-                weatherDTO.getDateTime(), handbook.getId());
+        try {
+            jdbcTemplate.update(insertWeatherQuery, newId, weatherDTO.getTemp_val(), city.getId(),
+                    weatherDTO.getDateTime(), handbook.getId());
 
-        return new WeatherEntity(newId, weatherDTO.getTemp_val(), city, weatherDTO.getDateTime(),handbook);
+            return new WeatherEntity(newId, weatherDTO.getTemp_val(), city, weatherDTO.getDateTime(), handbook);
+        } catch (DataAccessException exception) {
+            throw new WeatherSqlException(exception.getMessage());
+        }
     }
 
     @Override
     public void deleteWeatherByDateTime(String cityName, WeatherDTO weatherDTO) {
         final String deleteWeatherByDateTimeQuery = "DELETE FROM weather WHERE city_id = ? AND date_time = ?";
         CityEntity city = getCityByName(cityName);
-        jdbcTemplate.update(deleteWeatherByDateTimeQuery, city.getId(), weatherDTO.getDateTime());
+        try {
+            jdbcTemplate.update(deleteWeatherByDateTimeQuery, city.getId(), weatherDTO.getDateTime());
+        } catch (DataAccessException exception) {
+            throw new WeatherSqlException(exception.getMessage());
+        }
     }
 
     @Override
@@ -76,22 +94,30 @@ public class WeatherServiceJdbcImpl implements WeatherService {
 
     public WeatherEntity updateExistingWeather(WeatherEntity currentWeather, WeatherDTO weatherDTO) {
         final String updateWeatherQuery = "UPDATE weather SET temperature = ?, handbook_id = ? WHERE id = ?";
-        jdbcTemplate.update(updateWeatherQuery, weatherDTO.getTemp_val(), weatherDTO.getHandbook_id(),
-                currentWeather.getId());
-        return new WeatherEntity(currentWeather.getId(), weatherDTO.getTemp_val(),
-                currentWeather.getCity(), weatherDTO.getDateTime(),
-                getHandbookById(weatherDTO.getHandbook_id())
-        );
+        try {
+            jdbcTemplate.update(updateWeatherQuery, weatherDTO.getTemp_val(), weatherDTO.getHandbook_id(),
+                    currentWeather.getId());
+            return new WeatherEntity(currentWeather.getId(), weatherDTO.getTemp_val(),
+                    currentWeather.getCity(), weatherDTO.getDateTime(),
+                    getHandbookById(weatherDTO.getHandbook_id())
+            );
+        } catch (DataAccessException exception) {
+            throw new WeatherSqlException(exception.getMessage());
+        }
     }
 
     private WeatherEntity getWeatherByCityAndDatetime(CityEntity city, LocalDateTime dateTime) {
         final String getWeatherByCityAndDatetimeQuery = "SELECT * FROM weather WHERE city_id = ? AND date_time = ?";
-        List<WeatherEntity> results = jdbcTemplate.query(
-                getWeatherByCityAndDatetimeQuery,
-                (rs, rowNum) -> mapWeather(rs),
-                city.getId(), Timestamp.valueOf(dateTime)
-        );
-        return results.isEmpty() ? null : results.get(0);
+        try {
+            List<WeatherEntity> results = jdbcTemplate.query(
+                    getWeatherByCityAndDatetimeQuery,
+                    (rs, rowNum) -> mapWeather(rs),
+                    city.getId(), Timestamp.valueOf(dateTime)
+            );
+            return results.isEmpty() ? null : results.get(0);
+        } catch (DataAccessException exception) {
+            throw new WeatherSqlException(exception.getMessage());
+        }
     }
 
     private WeatherEntity mapWeather(ResultSet rs) throws SQLException {
@@ -119,6 +145,10 @@ public class WeatherServiceJdbcImpl implements WeatherService {
     public void deleteAllByCityName(String cityName) {
         final String deleteWeatherByDateTimeQuery = "DELETE FROM weather WHERE city_id = ?";
         CityEntity city = getCityByName(cityName);
-        jdbcTemplate.update(deleteWeatherByDateTimeQuery, city.getId());
+        try {
+            jdbcTemplate.update(deleteWeatherByDateTimeQuery, city.getId());
+        } catch (DataAccessException exception) {
+            throw new WeatherSqlException(exception.getMessage());
+        }
     }
 }

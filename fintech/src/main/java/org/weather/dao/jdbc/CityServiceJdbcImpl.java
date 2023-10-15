@@ -1,11 +1,13 @@
 package org.weather.dao.jdbc;
 
+import org.springframework.dao.DataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.weather.dto.CityDTO;
 import org.weather.entity.CityEntity;
 import org.weather.exception.city.CityAlreadyExistsException;
 import org.weather.exception.city.CityNotFoundException;
+import org.weather.exception.sql.CitySqlException;
 import org.weather.service.CityService;
 import org.weather.utils.MessageSourceWrapper;
 import org.weather.utils.enums.WeatherMessageEnum;
@@ -33,45 +35,62 @@ public class CityServiceJdbcImpl implements CityService {
         }
         String insertQuery = "INSERT INTO city (id, name) VALUES (?, ?)";
         UUID newId = UUID.randomUUID();
-        jdbcTemplate.update(insertQuery, newId.toString(), cityName);
-        return findCityByName(cityName);
+        try {
+            jdbcTemplate.update(insertQuery, newId.toString(), cityName);
+            return findCityByName(cityName);
+        } catch (DataAccessException exception) {
+            throw new CitySqlException(exception.getMessage());
+        }
     }
 
     @Override
     public void delete(String cityName) {
-        if(hasCityWithName(cityName)) {
-            String deleteQuery = "DELETE FROM city WHERE id = ?";
-            weatherServiceJdbc.deleteAllByCityName(cityName);
-            CityEntity city = findCityByName(cityName);
+        if(!hasCityWithName(cityName)){
+            return;
+        }
+        String deleteQuery = "DELETE FROM city WHERE id = ?";
+        weatherServiceJdbc.deleteAllByCityName(cityName);
+        CityEntity city = findCityByName(cityName);
+        try {
             jdbcTemplate.update(deleteQuery, city.getId().toString());
+        } catch (DataAccessException exception) {
+            throw new CitySqlException(exception.getMessage());
         }
     }
 
     @Override
     public List<CityEntity> findAll() {
         String findAllQuery = "SELECT * FROM city";
-        return jdbcTemplate.query(findAllQuery, (rs, rowNum) -> {
-            CityEntity city = new CityEntity();
-            city.setId(UUID.fromString(rs.getString("id")));
-            city.setName(rs.getString("name"));
-            return city;
-        });
+        try {
+            return jdbcTemplate.query(findAllQuery, (rs, rowNum) -> {
+                CityEntity city = new CityEntity();
+                city.setId(UUID.fromString(rs.getString("id")));
+                city.setName(rs.getString("name"));
+                return city;
+            });
+        } catch (DataAccessException exception) {
+            throw new CitySqlException(exception.getMessage());
+        }
     }
 
     @Override
     public CityEntity findCityById(UUID id) {
         String findCityByIdQuery = "SELECT * FROM city WHERE id = ?";
-        List<CityEntity> cityOrEmpty = jdbcTemplate.query(findCityByIdQuery, (rs, rowNum) -> {
-            CityEntity city = new CityEntity();
-            city.setId(UUID.fromString(rs.getString("id")));
-            city.setName(rs.getString("name"));
-            return city;
-        }, id);
-        if(cityOrEmpty.isEmpty()) {
-            throw new CityNotFoundException(HttpStatus.NOT_FOUND,
-                    messageSourceWrapper.getMessageCode(WeatherMessageEnum.CITY_NOT_FOUND));
+        try {
+            List<CityEntity> cityOrEmpty = jdbcTemplate.query(findCityByIdQuery, (rs, rowNum) -> {
+                CityEntity city = new CityEntity();
+                city.setId(UUID.fromString(rs.getString("id")));
+                city.setName(rs.getString("name"));
+                return city;
+            }, id);
+            if (cityOrEmpty.isEmpty()) {
+                throw new CityNotFoundException(HttpStatus.NOT_FOUND,
+                        messageSourceWrapper.getMessageCode(WeatherMessageEnum.CITY_NOT_FOUND));
+            }
+            return cityOrEmpty.get(0);
+        } catch (DataAccessException exception) {
+            throw new CitySqlException(exception.getMessage());
         }
-        return cityOrEmpty.get(0);
     }
 
     @Override
@@ -85,23 +104,31 @@ public class CityServiceJdbcImpl implements CityService {
         if(city == null) {
             return save(cityDTO.getNewName());
         }
-        jdbcTemplate.update(updateQuery, cityDTO.getNewName(), city.getId().toString());
-        city.setName(cityDTO.getNewName());
-        return city;
+        try {
+            jdbcTemplate.update(updateQuery, cityDTO.getNewName(), city.getId().toString());
+            city.setName(cityDTO.getNewName());
+            return city;
+        } catch (DataAccessException exception) {
+            throw new CitySqlException(exception.getMessage());
+        }
     }
 
     private CityEntity getCityByNameFromRepo(String cityName) {
         String findCityByNameQuery = "SELECT * FROM city WHERE name = ?";
-        List<CityEntity> cities = jdbcTemplate.query(findCityByNameQuery, (rs, rowNum) -> {
-            CityEntity city = new CityEntity();
-            city.setId(UUID.fromString(rs.getString("id")));
-            city.setName(rs.getString("name"));
-            return city;
-        }, cityName);
-        if (cities.isEmpty()) {
-            return null;
-        } else {
-            return cities.get(0);
+        try {
+            List<CityEntity> cities = jdbcTemplate.query(findCityByNameQuery, (rs, rowNum) -> {
+                CityEntity city = new CityEntity();
+                city.setId(UUID.fromString(rs.getString("id")));
+                city.setName(rs.getString("name"));
+                return city;
+            }, cityName);
+            if (cities.isEmpty()) {
+                return null;
+            } else {
+                return cities.get(0);
+            }
+        } catch (DataAccessException exception) {
+            throw new CitySqlException(exception.getMessage());
         }
     }
     public CityEntity findCityByName(String cityName) {
