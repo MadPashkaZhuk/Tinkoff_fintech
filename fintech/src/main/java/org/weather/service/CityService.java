@@ -1,16 +1,16 @@
 package org.weather.service;
 
 import org.weather.dto.CityDTO;
-import org.weather.entity.City;
+import org.weather.entity.CityEntity;
 
 import java.util.List;
 import java.util.UUID;
 
 public interface CityService {
-    City save(String cityName);
+    CityEntity save(String cityName);
     void delete(String cityName);
-    List<City> findAll();
-    City findCityById(UUID id);
-    City update(String cityName, CityDTO cityDTO);
-    City findCityByName(String cityName);
+    List<CityEntity> findAll();
+    CityEntity findCityById(UUID id);
+    CityEntity update(String cityName, CityDTO cityDTO);
+    CityEntity findCityByName(String cityName);
 }

@@ -1,9 +1,9 @@
-package org.weather.service.jdbc;
+package org.weather.dao.jdbc;
 
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
-import org.weather.entity.Handbook;
+import org.weather.entity.HandbookEntity;
 import org.weather.service.HandbookService;
 
 import javax.sql.DataSource;
@@ -19,10 +19,10 @@ public class HandbookServiceJdbcImpl implements HandbookService {
     }
 
     @Override
-    public List<Handbook> findAll() {
+    public List<HandbookEntity> findAll() {
         String findAllQuery = "SELECT * FROM handbook";
         return jdbcTemplate.query(findAllQuery, (rs, rowNum) -> {
-            Handbook handbook = new Handbook();
+            HandbookEntity handbook = new HandbookEntity();
             handbook.setId(rs.getInt("id"));
             handbook.setWeatherType(rs.getString("type"));
             return handbook;
@@ -30,10 +30,10 @@ public class HandbookServiceJdbcImpl implements HandbookService {
     }
 
     @Override
-    public Handbook findById(Integer id) {
+    public HandbookEntity findById(Integer id) {
         String findByIdQuery = "SELECT * FROM handbook WHERE id = ?";
         return jdbcTemplate.queryForObject(findByIdQuery, (rs, rowNum) -> {
-            Handbook handbook = new Handbook();
+            HandbookEntity handbook = new HandbookEntity();
             handbook.setId(rs.getInt("id"));
             handbook.setWeatherType(rs.getString("type"));
             return handbook;

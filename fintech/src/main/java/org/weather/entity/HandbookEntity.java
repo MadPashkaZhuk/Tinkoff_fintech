@@ -9,7 +9,7 @@ import lombok.Setter;
 @Table(name = "handbook")
 @Getter
 @Setter
-public class Handbook {
+public class HandbookEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Schema(name = "Handbook ID", requiredMode = Schema.RequiredMode.REQUIRED,

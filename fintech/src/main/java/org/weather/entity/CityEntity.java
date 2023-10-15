@@ -14,7 +14,7 @@ import java.util.UUID;
 @Getter
 @Setter
 @Table(name = "city")
-public class City {
+public class CityEntity {
     @Id
     @UuidGenerator
     @Schema(name = "City ID", requiredMode = Schema.RequiredMode.REQUIRED,

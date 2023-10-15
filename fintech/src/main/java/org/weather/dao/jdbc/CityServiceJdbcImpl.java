@@ -1,10 +1,10 @@
-package org.weather.service.jdbc;
+package org.weather.dao.jdbc;
 
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 import org.weather.dto.CityDTO;
-import org.weather.entity.City;
+import org.weather.entity.CityEntity;
 import org.weather.service.CityService;
 
 import javax.sql.DataSource;
@@ -21,7 +21,7 @@ public class CityServiceJdbcImpl implements CityService {
     }
 
     @Override
-    public City save(String cityName) {
+    public CityEntity save(String cityName) {
         String insertQuery = "INSERT INTO city (id, name) VALUES (?, ?)";
         UUID newId = UUID.randomUUID();
         jdbcTemplate.update(insertQuery, newId.toString(), cityName);
@@ -31,15 +31,15 @@ public class CityServiceJdbcImpl implements CityService {
     @Override
     public void delete(String cityName) {
         String deleteQuery = "DELETE FROM city WHERE id = ?";
-        City city = findCityByName(cityName);
+        CityEntity city = findCityByName(cityName);
         jdbcTemplate.update(deleteQuery, city.getId().toString());
     }
 
     @Override
-    public List<City> findAll() {
+    public List<CityEntity> findAll() {
         String findAllQuery = "SELECT * FROM city";
         return jdbcTemplate.query(findAllQuery, (rs, rowNum) -> {
-            City city = new City();
+            CityEntity city = new CityEntity();
             city.setId(UUID.fromString(rs.getString("id")));
             city.setName(rs.getString("name"));
             return city;
@@ -47,10 +47,10 @@ public class CityServiceJdbcImpl implements CityService {
     }
 
     @Override
-    public City findCityById(UUID id) {
+    public CityEntity findCityById(UUID id) {
         String findCityByIdQuery = "SELECT * FROM city WHERE id = ?";
         return jdbcTemplate.queryForObject(findCityByIdQuery, (rs, rowNum) -> {
-            City city = new City();
+            CityEntity city = new CityEntity();
             city.setId(UUID.fromString(rs.getString("id")));
             city.setName(rs.getString("name"));
             return city;
@@ -59,17 +59,17 @@ public class CityServiceJdbcImpl implements CityService {
 
 
     @Override
-    public City update(String cityName, CityDTO cityDTO) {
+    public CityEntity update(String cityName, CityDTO cityDTO) {
         String updateQuery = "UPDATE city SET name = ? WHERE id = ?";
-        City city = findCityByName(cityName);
+        CityEntity city = findCityByName(cityName);
         jdbcTemplate.update(updateQuery, cityDTO.getNewName(), city.getId().toString());
         return findCityByName(cityDTO.getNewName());
     }
 
-    public City findCityByName(String name) {
+    public CityEntity findCityByName(String name) {
         String findCityByNameQuery = "SELECT * FROM city WHERE name = ?";
         return jdbcTemplate.queryForObject(findCityByNameQuery, (rs, rowNum) -> {
-            City city = new City();
+            CityEntity city = new CityEntity();
             city.setId(UUID.fromString(rs.getString("id")));
             city.setName(rs.getString("name"));
             return city;

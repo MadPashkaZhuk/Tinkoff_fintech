@@ -27,7 +27,7 @@ databaseChangeLog:
                     referencedColumnNames: id
               - column:
                   name: handbook_id
-                  type: bigint
+                  type: int
                   constraints:
                     foreignKeyName: handbook_weather_fk
                     referencedTableName: handbook

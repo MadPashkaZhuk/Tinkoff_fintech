@@ -1,11 +1,11 @@
-package org.weather.service.hibernate;
+package org.weather.dao.hibernate;
 
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.weather.dto.CityDTO;
-import org.weather.entity.City;
+import org.weather.entity.CityEntity;
 import org.weather.exception.city.CityAlreadyExistsException;
 import org.weather.exception.city.CityNotFoundException;
 import org.weather.repository.CityRepository;
@@ -29,22 +29,22 @@ public class CityServiceImpl implements CityService {
         this.messageSourceWrapper = messageSourceWrapper;
     }
 
-    public City save(String cityName) {
+    public CityEntity save(String cityName) {
         if(cityRepository.getCityByName(cityName) != null) {
             throw new CityAlreadyExistsException(HttpStatus.BAD_REQUEST,
                     messageSourceWrapper.getMessageCode(WeatherMessageEnum.CITY_ALREADY_EXISTS));
         }
-        City newCity = new City();
+        CityEntity newCity = new CityEntity();
         newCity.setName(cityName);
         cityRepository.save(newCity);
         return newCity;
     }
 
-    public List<City> findAll() {
+    public List<CityEntity> findAll() {
         return cityRepository.findAll();
     }
-    public City findCityById(UUID id) {
-        Optional<City> city = cityRepository.findById(id);
+    public CityEntity findCityById(UUID id) {
+        Optional<CityEntity> city = cityRepository.findById(id);
         if(city.isEmpty()) {
             throw new CityNotFoundException(HttpStatus.NOT_FOUND,
                     messageSourceWrapper.getMessageCode(WeatherMessageEnum.CITY_NOT_FOUND));
@@ -60,8 +60,8 @@ public class CityServiceImpl implements CityService {
         }
     }
 
-    public City getCityByNameOrThrowException(String cityName) {
-        City city = this.findCityByName(cityName);
+    public CityEntity getCityByNameOrThrowException(String cityName) {
+        CityEntity city = this.findCityByName(cityName);
         if(city == null) {
             throw new CityNotFoundException(HttpStatus.NOT_FOUND,
                     messageSourceWrapper.getMessageCode(WeatherMessageEnum.CITY_NOT_FOUND));
@@ -69,15 +69,15 @@ public class CityServiceImpl implements CityService {
         return city;
     }
     @Transactional
-    public City update(String cityName, CityDTO cityDTO) {
-        City existingCity = this.getCityByNameOrThrowException(cityName);
+    public CityEntity update(String cityName, CityDTO cityDTO) {
+        CityEntity existingCity = this.getCityByNameOrThrowException(cityName);
         cityRepository.updateCityNameById(existingCity.getId(), cityDTO.getNewName());
         existingCity = cityRepository.getCityByName(cityName);
         return existingCity;
     }
 
     @Override
-    public City findCityByName(String cityName) {
+    public CityEntity findCityByName(String cityName) {
         return cityRepository.getCityByName(cityName);
     }
 }

@@ -9,7 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 import org.weather.dto.WeatherDTO;
-import org.weather.entity.Weather;
+import org.weather.entity.WeatherEntity;
 import org.weather.service.WeatherService;
 
 import java.util.List;
@@ -26,7 +26,7 @@ public class WeatherRestController {
             @ApiResponse(responseCode = "200", description = "All data retrieved successfully")
     })
     @GetMapping
-    ResponseEntity<List<Weather>> getAllWeather() {
+    ResponseEntity<List<WeatherEntity>> getAllWeather() {
         return ResponseEntity.ok()
                 .body(weatherServiceImpl.findAll());
     }

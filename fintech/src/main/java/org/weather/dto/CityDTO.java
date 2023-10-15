@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 public class CityDTO {
-    @Schema(name = "City name", requiredMode = Schema.RequiredMode.REQUIRED,
+    @Schema(name = "CityEntity name", requiredMode = Schema.RequiredMode.REQUIRED,
             description = "name of the city", example = "Minsk")
     @NotNull(message = "Name of the city can't be null")
     String newName;

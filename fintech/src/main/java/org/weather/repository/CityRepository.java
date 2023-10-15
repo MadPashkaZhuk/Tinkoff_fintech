@@ -7,18 +7,18 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
-import org.weather.entity.City;
+import org.weather.entity.CityEntity;
 
 import java.util.UUID;
 
 @Repository
 @ConditionalOnProperty(value = "hibernate.enable", havingValue = "true")
-public interface CityRepository extends JpaRepository<City, UUID> {
-    City getCityByName(String cityName);
+public interface CityRepository extends JpaRepository<CityEntity, UUID> {
+    CityEntity getCityByName(String cityName);
     @Transactional
     void deleteCityByName(String cityName);
     @Modifying
-    @Query("UPDATE City c SET c.name = :newCityName where c.id = :cityId")
+    @Query("UPDATE CityEntity c SET c.name = :newCityName where c.id = :cityId")
     @Transactional
     void updateCityNameById(@Param("cityId") UUID cityId, @Param("newCityName") String newCityName);
 }

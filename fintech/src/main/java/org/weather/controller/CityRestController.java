@@ -9,7 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 import org.weather.dto.CityDTO;
-import org.weather.entity.City;
+import org.weather.entity.CityEntity;
 import org.weather.service.CityService;
 
 import java.util.List;
@@ -27,7 +27,7 @@ public class CityRestController {
             @ApiResponse(responseCode = "200", description = "All information is shown")
     })
     @GetMapping
-    public ResponseEntity<List<City>> getCities() {
+    public ResponseEntity<List<CityEntity>> getCities() {
         return ResponseEntity.ok()
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(cityServiceImpl.findAll());
@@ -39,7 +39,7 @@ public class CityRestController {
             @ApiResponse(responseCode = "404", description = "City with this id doesn't exist in database")
     })
     @GetMapping("/{id}")
-    public ResponseEntity<City> getCityById(@PathVariable("id") UUID id) {
+    public ResponseEntity<CityEntity> getCityById(@PathVariable("id") UUID id) {
         return ResponseEntity.ok()
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(cityServiceImpl.findCityById(id));
@@ -51,8 +51,8 @@ public class CityRestController {
             @ApiResponse(responseCode = "400", description = "City with this name already created")
     })
     @PostMapping("/{cityName}")
-    public ResponseEntity<City> saveCity(@PathVariable("cityName") String cityName,
-                                         UriComponentsBuilder uriComponentsBuilder) {
+    public ResponseEntity<CityEntity> saveCity(@PathVariable("cityName") String cityName,
+                                               UriComponentsBuilder uriComponentsBuilder) {
         return ResponseEntity.created(uriComponentsBuilder
                         .path("/city/{cityName}")
                         .build(Map.of("cityName", cityName)))
@@ -67,9 +67,9 @@ public class CityRestController {
             @ApiResponse(responseCode = "404", description = "City provided doesn't exist")
     })
     @PutMapping("/{cityName}")
-    public ResponseEntity<City> updateCity(@PathVariable("cityName") String cityName,
-                                           @RequestBody CityDTO cityDTO,
-                                           UriComponentsBuilder uriComponentsBuilder) {
+    public ResponseEntity<CityEntity> updateCity(@PathVariable("cityName") String cityName,
+                                                 @RequestBody CityDTO cityDTO,
+                                                 UriComponentsBuilder uriComponentsBuilder) {
         return ResponseEntity.created(uriComponentsBuilder
                     .path("/city/{cityName}")
                     .build(Map.of("cityName", cityName)))

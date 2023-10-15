@@ -1,4 +1,4 @@
-package org.weather.service.hibernate;
+package org.weather.dao.hibernate;
 
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Lazy;
@@ -6,9 +6,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.weather.dto.WeatherDTO;
-import org.weather.entity.City;
-import org.weather.entity.Handbook;
-import org.weather.entity.Weather;
+import org.weather.entity.CityEntity;
+import org.weather.entity.HandbookEntity;
+import org.weather.entity.WeatherEntity;
 import org.weather.exception.weather.WeatherNotFoundException;
 import org.weather.repository.WeatherRepository;
 import org.weather.service.WeatherService;
@@ -35,18 +35,18 @@ public class WeatherServiceImpl implements WeatherService {
         this.messageSourceWrapper = messageSourceWrapper;
     }
 
-    public List<Weather> getWeatherForCity(String cityName) {
-        City city = getCityByName(cityName);
+    public List<WeatherEntity> getWeatherForCity(String cityName) {
+        CityEntity city = getCityByName(cityName);
         return weatherRepository.findWeatherByCity(city);
     }
 
-    public Weather saveWeatherForCity(String cityName, WeatherDTO newWeatherData) {
-        City city = getCityByName(cityName);
+    public WeatherEntity saveWeatherForCity(String cityName, WeatherDTO newWeatherData) {
+        CityEntity city = getCityByName(cityName);
         if(weatherRepository.getWeatherByCityAndDatetime(city, newWeatherData.getDateTime()) != null) {
             throw new WeatherNotFoundException(HttpStatus.BAD_REQUEST,
                     messageSourceWrapper.getMessageCode(WeatherMessageEnum.WEATHER_ALREADY_EXISTS));
         }
-        Weather weather = new Weather(newWeatherData.getTemp_val(),
+        WeatherEntity weather = new WeatherEntity(newWeatherData.getTemp_val(),
                 city,
                 newWeatherData.getDateTime(),
                 getHandbookById(newWeatherData.getHandbook_id()));
@@ -56,25 +56,25 @@ public class WeatherServiceImpl implements WeatherService {
 
     @Transactional
     public void deleteWeatherByDateTime(String cityName, WeatherDTO weatherToDelete) {
-        City city = getCityByName(cityName);
+        CityEntity city = getCityByName(cityName);
         weatherRepository.deleteWeatherByCityAndDatetime(city,
                 weatherToDelete.getDateTime());
     }
 
     @Transactional
     public void deleteAll(String cityName){
-        City city = getCityByName(cityName);
+        CityEntity city = getCityByName(cityName);
         weatherRepository.deleteAllByCity(city);
     }
 
-    public List<Weather> findAll() {
+    public List<WeatherEntity> findAll() {
         return weatherRepository.findAll();
     }
 
     @Transactional
-    public Weather updateWeatherForCity(String cityName, WeatherDTO newWeatherData) {
-        City city = getCityByName(cityName);
-        Weather currentWeather = weatherRepository.getWeatherByCityAndDatetime(city, newWeatherData.getDateTime());
+    public WeatherEntity updateWeatherForCity(String cityName, WeatherDTO newWeatherData) {
+        CityEntity city = getCityByName(cityName);
+        WeatherEntity currentWeather = weatherRepository.getWeatherByCityAndDatetime(city, newWeatherData.getDateTime());
         if (currentWeather == null) {
             return saveWeatherForCity(cityName, newWeatherData);
         }
@@ -82,8 +82,8 @@ public class WeatherServiceImpl implements WeatherService {
     }
 
     @Transactional
-    public Weather updateExistingWeather(Weather currentWeather, WeatherDTO newWeatherData) {
-        Handbook handbook = getHandbookById(newWeatherData.getHandbook_id());
+    public WeatherEntity updateExistingWeather(WeatherEntity currentWeather, WeatherDTO newWeatherData) {
+        HandbookEntity handbook = getHandbookById(newWeatherData.getHandbook_id());
         weatherRepository.updateWeatherById(currentWeather.getId(),
                 newWeatherData.getTemp_val(), handbook);
         currentWeather.setHandbook(handbook);
@@ -91,11 +91,11 @@ public class WeatherServiceImpl implements WeatherService {
         return currentWeather;
     }
 
-    private City getCityByName(String cityName) {
+    private CityEntity getCityByName(String cityName) {
         return cityServiceImpl.getCityByNameOrThrowException(cityName);
     }
 
-    private Handbook getHandbookById(Integer handbook_id) {
+    private HandbookEntity getHandbookById(Integer handbook_id) {
         return handbookServiceImpl.findById(handbook_id);
     }
 }

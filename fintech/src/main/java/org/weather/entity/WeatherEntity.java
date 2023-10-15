@@ -14,7 +14,7 @@ import java.util.UUID;
 @Data
 
 @NoArgsConstructor
-public class Weather {
+public class WeatherEntity {
     @Id
     @UuidGenerator
     @Schema(name = "Weather ID", requiredMode = Schema.RequiredMode.REQUIRED,
@@ -29,7 +29,7 @@ public class Weather {
     @ManyToOne(cascade = CascadeType.REMOVE, optional = false)
     @Schema(name = "City", requiredMode = Schema.RequiredMode.REQUIRED,
             description = "City name", example = "Minsk")
-    private City city;
+    private CityEntity city;
 
     @Column(name = "date_time")
     @Schema(type = "string", name = "Weather Date and Time", requiredMode = Schema.RequiredMode.REQUIRED,
@@ -39,9 +39,9 @@ public class Weather {
     @ManyToOne
     @Schema(name = "Handbook", requiredMode = Schema.RequiredMode.REQUIRED,
             description = "Handbook type, there are 9 of them", example = "sunshine")
-    private Handbook handbook;
+    private HandbookEntity handbook;
 
-    public Weather(double temp_c, City city, LocalDateTime datetime, Handbook handbook) {
+    public WeatherEntity(double temp_c, CityEntity city, LocalDateTime datetime, HandbookEntity handbook) {
         this.temp_c = temp_c;
         this.city = city;
         this.datetime = datetime;

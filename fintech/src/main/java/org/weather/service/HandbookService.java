@@ -1,10 +1,10 @@
 package org.weather.service;
 
-import org.weather.entity.Handbook;
+import org.weather.entity.HandbookEntity;
 
 import java.util.List;
 
 public interface HandbookService {
-    List<Handbook> findAll();
-    Handbook findById(Integer id);
+    List<HandbookEntity> findAll();
+    HandbookEntity findById(Integer id);
 }

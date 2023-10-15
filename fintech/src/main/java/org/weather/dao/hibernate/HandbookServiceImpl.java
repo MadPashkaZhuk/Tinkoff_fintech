@@ -1,9 +1,9 @@
-package org.weather.service.hibernate;
+package org.weather.dao.hibernate;
 
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.weather.entity.Handbook;
+import org.weather.entity.HandbookEntity;
 import org.weather.exception.handbook.HandbookTypeNotFoundException;
 import org.weather.repository.HandbookRepository;
 import org.weather.service.HandbookService;
@@ -24,12 +24,12 @@ public class HandbookServiceImpl implements HandbookService {
         this.messageSourceWrapper = messageSourceWrapper;
     }
 
-    public List<Handbook> findAll() {
+    public List<HandbookEntity> findAll() {
         return handbookRepository.findAll();
     }
 
-    public Handbook findById(Integer id) {
-        Optional<Handbook> handbook = handbookRepository.findById(id);
+    public HandbookEntity findById(Integer id) {
+        Optional<HandbookEntity> handbook = handbookRepository.findById(id);
         if(handbook.isEmpty()) {
             throw new HandbookTypeNotFoundException(HttpStatus.NOT_FOUND,
                     messageSourceWrapper.getMessageCode(WeatherMessageEnum.HANDBOOK_NOT_FOUND));
