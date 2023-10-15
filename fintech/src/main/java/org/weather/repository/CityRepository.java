@@ -1,5 +1,6 @@
 package org.weather.repository;
 
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -11,6 +12,7 @@ import org.weather.entity.City;
 import java.util.UUID;
 
 @Repository
+@ConditionalOnProperty(value = "hibernate.enable", havingValue = "true")
 public interface CityRepository extends JpaRepository<City, UUID> {
     City getCityByName(String cityName);
     @Transactional

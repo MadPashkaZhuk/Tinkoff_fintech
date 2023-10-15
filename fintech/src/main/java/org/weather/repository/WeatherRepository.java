@@ -1,5 +1,6 @@
 package org.weather.repository;
 
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -15,6 +16,7 @@ import java.util.List;
 import java.util.UUID;
 
 @Repository
+@ConditionalOnProperty(value = "hibernate.enable", havingValue = "true")
 public interface WeatherRepository extends JpaRepository<Weather, UUID> {
     List<Weather> findWeatherByCity(City city);
     @Modifying

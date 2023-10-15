@@ -2,7 +2,6 @@ package org.weather.service.hibernate;
 
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Lazy;
-import org.springframework.context.annotation.Primary;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,7 +18,6 @@ import org.weather.utils.enums.WeatherMessageEnum;
 import java.util.List;
 
 @Service
-@Primary
 @ConditionalOnProperty(value = "hibernate.enable", havingValue = "true")
 public class WeatherServiceImpl implements WeatherService {
     private final WeatherRepository weatherRepository;

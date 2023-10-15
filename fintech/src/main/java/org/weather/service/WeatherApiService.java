@@ -1,7 +1,6 @@
 package org.weather.service;
 
 import org.springframework.stereotype.Service;
-import org.weather.dto.WeatherDTO;
 import org.weather.dto.weatherapi.WeatherApiDTO;
 
 @Service

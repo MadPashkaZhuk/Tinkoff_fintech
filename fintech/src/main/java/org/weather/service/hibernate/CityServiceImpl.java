@@ -1,8 +1,6 @@
 package org.weather.service.hibernate;
 
-import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.context.annotation.Primary;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,12 +18,16 @@ import java.util.Optional;
 import java.util.UUID;
 
 @Service
-@RequiredArgsConstructor
 @ConditionalOnProperty(value = "hibernate.enable", havingValue = "true")
 public class CityServiceImpl implements CityService {
     private final CityRepository cityRepository;
     private final WeatherServiceImpl weatherServiceImpl;
     private final MessageSourceWrapper messageSourceWrapper;
+    public CityServiceImpl(CityRepository cityRepository, WeatherServiceImpl weatherServiceImpl, MessageSourceWrapper messageSourceWrapper) {
+        this.cityRepository = cityRepository;
+        this.weatherServiceImpl = weatherServiceImpl;
+        this.messageSourceWrapper = messageSourceWrapper;
+    }
 
     public City save(String cityName) {
         if(cityRepository.getCityByName(cityName) != null) {

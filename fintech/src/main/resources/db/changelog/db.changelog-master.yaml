@@ -9,3 +9,5 @@ databaseChangeLog:
       file: db/changelog/changeset/insert-handbook-table.yaml
   - include:
       file: db/changelog/changeset/insert-city-table.yaml
+  - include:
+      file: db/changelog/changeset/insert-weather-table.yaml
