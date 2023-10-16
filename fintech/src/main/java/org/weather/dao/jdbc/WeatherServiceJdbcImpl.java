@@ -8,8 +8,6 @@ import org.weather.dto.HandbookDTO;
 import org.weather.dto.NewWeatherDTO;
 import org.weather.dto.WeatherDTO;
 import org.weather.exception.sql.WeatherSqlException;
-import org.weather.service.CityService;
-import org.weather.service.HandbookService;
 import org.weather.service.WeatherService;
 
 import javax.sql.DataSource;
@@ -22,10 +20,10 @@ import java.util.UUID;
 
 public class WeatherServiceJdbcImpl implements WeatherService {
     private final JdbcTemplate jdbcTemplate;
-    private final CityService cityService;
-    private final HandbookService handbookService;
-    public WeatherServiceJdbcImpl(DataSource dataSource, @Lazy CityService cityService,
-                                  HandbookService handbookService) {
+    private final CityServiceJdbcImpl cityService;
+    private final HandbookServiceJdbcImpl handbookService;
+    public WeatherServiceJdbcImpl(DataSource dataSource, @Lazy CityServiceJdbcImpl cityService,
+                                  HandbookServiceJdbcImpl handbookService) {
         this.jdbcTemplate = new JdbcTemplate(dataSource);
         this.cityService = cityService;
         this.handbookService = handbookService;
@@ -84,6 +82,9 @@ public class WeatherServiceJdbcImpl implements WeatherService {
 
     @Override
     public WeatherDTO updateWeatherForCity(String cityName, NewWeatherDTO newWeatherDTO) {
+        if(cityService.getCityEntityByNameFromRepo(cityName) == null) {
+            cityService.save(cityName);
+        }
         CityDTO city = getCityByName(cityName);
         WeatherDTO currentWeather = getWeatherByCityAndDatetime(city, newWeatherDTO.getDateTime());
         if(currentWeather == null) {

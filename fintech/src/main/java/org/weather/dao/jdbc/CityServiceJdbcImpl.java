@@ -117,7 +117,7 @@ public class CityServiceJdbcImpl implements CityService {
         }
     }
 
-    private CityEntity getCityEntityByNameFromRepo(String cityName) {
+    public CityEntity getCityEntityByNameFromRepo(String cityName) {
         String findCityByNameQuery = "SELECT * FROM city WHERE name = ?";
         try {
             List<CityEntity> cities = jdbcTemplate.query(findCityByNameQuery, (rs, rowNum) -> {

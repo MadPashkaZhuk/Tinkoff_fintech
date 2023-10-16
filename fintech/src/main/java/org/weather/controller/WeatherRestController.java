@@ -75,8 +75,7 @@ public class WeatherRestController {
 
     @Operation(summary = "Delete weather info by specific dateTime")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "201", description = "Weather data updated successfully"),
-            @ApiResponse(responseCode = "404", description = "City provided doesn't exist")
+            @ApiResponse(responseCode = "201", description = "Weather data updated successfully")
     })
     @PutMapping("/{cityName}")
     ResponseEntity<?> updateWeatherForCityByDateTime(@PathVariable("cityName") String cityName,

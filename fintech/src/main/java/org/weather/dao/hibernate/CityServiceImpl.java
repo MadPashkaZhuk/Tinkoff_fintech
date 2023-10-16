@@ -94,7 +94,7 @@ public class CityServiceImpl implements CityService {
         return cityRepository.getCityByName(cityName);
     }
 
-    private boolean hasCityWithName(String cityName) {
+    public boolean hasCityWithName(String cityName) {
         return cityRepository.getCityByName(cityName) != null;
     }
 

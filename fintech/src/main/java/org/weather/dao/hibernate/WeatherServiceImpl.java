@@ -75,6 +75,9 @@ public class WeatherServiceImpl implements WeatherService {
 
     @Transactional
     public WeatherDTO updateWeatherForCity(String cityName, NewWeatherDTO newWeatherData) {
+        if(!cityServiceImpl.hasCityWithName(cityName)) {
+            cityServiceImpl.save(cityName);
+        }
         CityEntity city = getCityEntityByNameFromRepo(cityName);
         WeatherEntity currentWeather = weatherRepository.getWeatherByCityAndDatetime(city, newWeatherData.getDateTime());
         if (currentWeather == null) {
