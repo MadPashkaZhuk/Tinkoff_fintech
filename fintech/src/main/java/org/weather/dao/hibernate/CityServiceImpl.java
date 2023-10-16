@@ -3,11 +3,13 @@ package org.weather.dao.hibernate;
 import org.springframework.http.HttpStatus;
 import org.springframework.transaction.annotation.Transactional;
 import org.weather.dto.CityDTO;
+import org.weather.dto.NewCityDTO;
 import org.weather.entity.CityEntity;
 import org.weather.exception.city.CityAlreadyExistsException;
 import org.weather.exception.city.CityNotFoundException;
 import org.weather.repository.CityRepository;
 import org.weather.service.CityService;
+import org.weather.utils.EntityMapper;
 import org.weather.utils.MessageSourceWrapper;
 import org.weather.utils.enums.WeatherMessageEnum;
 
@@ -19,13 +21,16 @@ public class CityServiceImpl implements CityService {
     private final CityRepository cityRepository;
     private final WeatherServiceImpl weatherServiceImpl;
     private final MessageSourceWrapper messageSourceWrapper;
-    public CityServiceImpl(CityRepository cityRepository, WeatherServiceImpl weatherServiceImpl, MessageSourceWrapper messageSourceWrapper) {
+    private final EntityMapper entityMapper;
+    public CityServiceImpl(CityRepository cityRepository, WeatherServiceImpl weatherServiceImpl,
+                           MessageSourceWrapper messageSourceWrapper, EntityMapper entityMapper) {
         this.cityRepository = cityRepository;
         this.weatherServiceImpl = weatherServiceImpl;
         this.messageSourceWrapper = messageSourceWrapper;
+        this.entityMapper = entityMapper;
     }
 
-    public CityEntity save(String cityName) {
+    public CityDTO save(String cityName) {
         if(hasCityWithName(cityName)) {
             throw new CityAlreadyExistsException(HttpStatus.BAD_REQUEST,
                     messageSourceWrapper.getMessageCode(WeatherMessageEnum.CITY_ALREADY_EXISTS));
@@ -33,19 +38,20 @@ public class CityServiceImpl implements CityService {
         CityEntity newCity = new CityEntity();
         newCity.setName(cityName);
         cityRepository.save(newCity);
-        return newCity;
+        return mapCityEntityToDTO(newCity);
     }
 
-    public List<CityEntity> findAll() {
-        return cityRepository.findAll();
+    public List<CityDTO> findAll() {
+        return mapCityEntityListToDtoList(cityRepository.findAll());
     }
-    public CityEntity findCityById(UUID id) {
+
+    public CityDTO findCityById(UUID id) {
         Optional<CityEntity> city = cityRepository.findById(id);
         if(city.isEmpty()) {
             throw new CityNotFoundException(HttpStatus.NOT_FOUND,
                     messageSourceWrapper.getMessageCode(WeatherMessageEnum.CITY_NOT_FOUND));
         }
-        return city.get();
+        return mapCityEntityToDTO(city.get());
     }
 
     @Transactional
@@ -56,37 +62,47 @@ public class CityServiceImpl implements CityService {
         }
     }
 
-    public CityEntity getCityByNameOrThrowException(String cityName) {
+    public CityEntity getCityEntityByNameOrThrowException(String cityName) {
         if(!hasCityWithName(cityName)) {
             throw new CityNotFoundException(HttpStatus.NOT_FOUND,
                     messageSourceWrapper.getMessageCode(WeatherMessageEnum.CITY_NOT_FOUND));
         }
-        return getCityByName(cityName);
-    }
-    @Transactional
-    public CityEntity update(String cityName, CityDTO cityDTO) {
-        CityEntity city = getCityByName(cityName);
-        if(hasCityWithName(cityDTO.getNewName())) {
-            delete(cityName);
-            return getCityByName(cityDTO.getNewName());
-        }
-        if (city == null) {
-            return save(cityDTO.getNewName());
-        }
-        cityRepository.updateCityNameById(city.getId(), cityDTO.getNewName());
-        city.setName(cityDTO.getNewName());
-        return city;
+        return getCityEntityByName(cityName);
     }
 
-    private CityEntity getCityByName(String cityName) {
-        return cityRepository.getCityByName(cityName);
+    @Transactional
+    public CityDTO update(String cityName, NewCityDTO newCityDTO) {
+        CityEntity city = getCityEntityByName(cityName);
+        if(hasCityWithName(newCityDTO.getNewName())) {
+            delete(cityName);
+            return mapCityEntityToDTO(getCityEntityByName(newCityDTO.getNewName()));
+        }
+        if (city == null) {
+            return save(newCityDTO.getNewName());
+        }
+        cityRepository.updateCityNameById(city.getId(), newCityDTO.getNewName());
+        city.setName(newCityDTO.getNewName());
+        return mapCityEntityToDTO(city);
     }
 
     @Override
-    public CityEntity findCityByName(String cityName) {
-        return getCityByNameOrThrowException(cityName);
+    public CityDTO findCityByName(String cityName) {
+        return mapCityEntityToDTO(getCityEntityByNameOrThrowException(cityName));
     }
+
+    private CityEntity getCityEntityByName(String cityName) {
+        return cityRepository.getCityByName(cityName);
+    }
+
     private boolean hasCityWithName(String cityName) {
         return cityRepository.getCityByName(cityName) != null;
+    }
+
+    private CityDTO mapCityEntityToDTO(CityEntity city) {
+        return entityMapper.mapCityEntityToDTO(city);
+    }
+
+    private List<CityDTO> mapCityEntityListToDtoList(List<CityEntity> cityEntityList) {
+        return entityMapper.mapCityEntityListToDtoList(cityEntityList);
     }
 }

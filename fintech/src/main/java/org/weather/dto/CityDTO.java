@@ -1,19 +1,14 @@
 package org.weather.dto;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.constraints.NotNull;
 import lombok.Value;
+
+import java.util.UUID;
 
 @Value
 public class CityDTO {
-    @Schema(name = "CityEntity name", requiredMode = Schema.RequiredMode.REQUIRED,
-            description = "name of the city", example = "Minsk")
-    @NotNull(message = "Name of the city can't be null")
-    String newName;
-
-    @JsonCreator
-    public CityDTO(String newName) {
-        this.newName = newName;
-    }
+    @Schema(name = "Id", description = "Unique UUID", example = "e3d8b008-90c3-466e-918a-c9e7e4656996")
+    UUID id;
+    @Schema(name = "City name", description = "name of the city", example = "Minsk")
+    String name;
 }

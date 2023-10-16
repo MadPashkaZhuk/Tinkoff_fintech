@@ -7,8 +7,8 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
+import org.weather.dto.NewWeatherDTO;
 import org.weather.dto.WeatherDTO;
-import org.weather.entity.WeatherEntity;
 import org.weather.service.WeatherService;
 
 import java.util.List;
@@ -28,7 +28,7 @@ public class WeatherRestController {
             @ApiResponse(responseCode = "200", description = "All data retrieved successfully")
     })
     @GetMapping
-    ResponseEntity<List<WeatherEntity>> getAllWeather() {
+    ResponseEntity<List<WeatherDTO>> getAllWeather() {
         return ResponseEntity.ok()
                 .body(weatherService.findAll());
     }
@@ -52,13 +52,13 @@ public class WeatherRestController {
     })
     @PostMapping("/{cityName}")
     ResponseEntity<?> saveWeatherForCity(@PathVariable("cityName") String cityName,
-                                         @RequestBody WeatherDTO weatherDTO,
+                                         @RequestBody NewWeatherDTO newWeatherDTO,
                                          UriComponentsBuilder uriComponentsBuilder) {
         return ResponseEntity.created(uriComponentsBuilder
                         .path("/weather/{cityName}")
                         .build(Map.of("cityName", cityName)))
                 .contentType(MediaType.APPLICATION_JSON)
-                .body(weatherService.saveWeatherForCity(cityName, weatherDTO));
+                .body(weatherService.saveWeatherForCity(cityName, newWeatherDTO));
     }
 
     @Operation(summary = "Delete weather info by specific dateTime")
@@ -67,8 +67,8 @@ public class WeatherRestController {
     })
     @DeleteMapping("/{cityName}")
     ResponseEntity<?> deleteWeatherForCityByDateTime(@PathVariable("cityName") String cityName,
-                                                     @RequestBody WeatherDTO weatherDTO) {
-        weatherService.deleteWeatherByDateTime(cityName, weatherDTO);
+                                                     @RequestBody NewWeatherDTO newWeatherDTO) {
+        weatherService.deleteWeatherByDateTime(cityName, newWeatherDTO);
         return ResponseEntity.noContent()
                 .build();
     }
@@ -80,12 +80,12 @@ public class WeatherRestController {
     })
     @PutMapping("/{cityName}")
     ResponseEntity<?> updateWeatherForCityByDateTime(@PathVariable("cityName") String cityName,
-                                                     @RequestBody WeatherDTO weatherDTO,
+                                                     @RequestBody NewWeatherDTO newWeatherDTO,
                                                      UriComponentsBuilder uriComponentsBuilder) {
         return ResponseEntity.created(uriComponentsBuilder
                         .path("/weather/{cityName}")
                         .build(Map.of("cityName", cityName)))
                 .contentType(MediaType.APPLICATION_JSON)
-                .body(weatherService.updateWeatherForCity(cityName, weatherDTO));
+                .body(weatherService.updateWeatherForCity(cityName, newWeatherDTO));
     }
 }

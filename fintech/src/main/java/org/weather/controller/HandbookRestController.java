@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.weather.entity.HandbookEntity;
+import org.weather.dto.HandbookDTO;
 import org.weather.service.HandbookService;
 
 import java.util.List;
@@ -28,7 +28,7 @@ public class HandbookRestController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "All information is shown")
     })
-    ResponseEntity<List<HandbookEntity>> getAllHandbookTypes() {
+    ResponseEntity<List<HandbookDTO>> getAllHandbookTypes() {
         return ResponseEntity.ok()
                 .body(handbookService.findAll());
     }
@@ -38,7 +38,7 @@ public class HandbookRestController {
             @ApiResponse(responseCode = "404", description = "Handbook with this id doesn't exist in database")
     })
     @GetMapping("/{id}")
-    ResponseEntity<HandbookEntity> getHandbookTypeById(@PathVariable("id") Integer id) {
+    ResponseEntity<HandbookDTO> getHandbookTypeById(@PathVariable("id") Integer id) {
         return ResponseEntity.ok()
                 .body(handbookService.findById(id));
     }

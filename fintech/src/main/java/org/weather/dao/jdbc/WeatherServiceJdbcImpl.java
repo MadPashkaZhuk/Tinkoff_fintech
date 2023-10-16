@@ -3,10 +3,10 @@ package org.weather.dao.jdbc;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.weather.dto.CityDTO;
+import org.weather.dto.HandbookDTO;
+import org.weather.dto.NewWeatherDTO;
 import org.weather.dto.WeatherDTO;
-import org.weather.entity.CityEntity;
-import org.weather.entity.HandbookEntity;
-import org.weather.entity.WeatherEntity;
 import org.weather.exception.sql.WeatherSqlException;
 import org.weather.service.CityService;
 import org.weather.service.HandbookService;
@@ -31,7 +31,7 @@ public class WeatherServiceJdbcImpl implements WeatherService {
         this.handbookService = handbookService;
     }
     @Override
-    public List<WeatherEntity> findAll() {
+    public List<WeatherDTO> findAll() {
         final String findAllQuery = "SELECT * FROM weather";
         try {
             return jdbcTemplate.query(findAllQuery, (rs, rowNum) -> mapWeather(rs));
@@ -41,8 +41,8 @@ public class WeatherServiceJdbcImpl implements WeatherService {
     }
 
     @Override
-    public List<WeatherEntity> getWeatherForCity(String cityName) {
-        CityEntity city = getCityByName(cityName);
+    public List<WeatherDTO> getWeatherForCity(String cityName) {
+        CityDTO city = getCityByName(cityName);
         final String findAllWeatherForCityQuery = "SELECT * FROM weather WHERE city_id = ?";
         try {
             return jdbcTemplate.query(
@@ -56,60 +56,60 @@ public class WeatherServiceJdbcImpl implements WeatherService {
     }
 
     @Override
-    public WeatherEntity saveWeatherForCity(String cityName, WeatherDTO weatherDTO) {
+    public WeatherDTO saveWeatherForCity(String cityName, NewWeatherDTO newWeatherDTO) {
         final String insertWeatherQuery = "INSERT INTO weather (id, temperature, city_id, date_time, handbook_id) VALUES (?, ?, ?, ?, ?)";
-        HandbookEntity handbook = getHandbookById(weatherDTO.getHandbook_id());
-        CityEntity city = getCityByName(cityName);
+        HandbookDTO handbook = getHandbookDTOById(newWeatherDTO.getHandbook_id());
+        CityDTO city = getCityByName(cityName);
         UUID newId = UUID.randomUUID();
         try {
-            jdbcTemplate.update(insertWeatherQuery, newId, weatherDTO.getTemp_val(), city.getId(),
-                    weatherDTO.getDateTime(), handbook.getId());
-
-            return new WeatherEntity(newId, weatherDTO.getTemp_val(), city, weatherDTO.getDateTime(), handbook);
+            jdbcTemplate.update(insertWeatherQuery, newId, newWeatherDTO.getTemp_val(), city.getId(),
+                    newWeatherDTO.getDateTime(), handbook.getId());
+            return new WeatherDTO(newId, newWeatherDTO.getTemp_val(), newWeatherDTO.getDateTime(),
+                    city, handbook);
         } catch (DataAccessException exception) {
             throw new WeatherSqlException(exception.getMessage());
         }
     }
 
     @Override
-    public void deleteWeatherByDateTime(String cityName, WeatherDTO weatherDTO) {
+    public void deleteWeatherByDateTime(String cityName, NewWeatherDTO newWeatherDTO) {
         final String deleteWeatherByDateTimeQuery = "DELETE FROM weather WHERE city_id = ? AND date_time = ?";
-        CityEntity city = getCityByName(cityName);
+        CityDTO city = getCityByName(cityName);
         try {
-            jdbcTemplate.update(deleteWeatherByDateTimeQuery, city.getId(), weatherDTO.getDateTime());
+            jdbcTemplate.update(deleteWeatherByDateTimeQuery, city.getId(), newWeatherDTO.getDateTime());
         } catch (DataAccessException exception) {
             throw new WeatherSqlException(exception.getMessage());
         }
     }
 
     @Override
-    public WeatherEntity updateWeatherForCity(String cityName, WeatherDTO weatherDTO) {
-        CityEntity city = getCityByName(cityName);
-        WeatherEntity currentWeather = getWeatherByCityAndDatetime(city, weatherDTO.getDateTime());
+    public WeatherDTO updateWeatherForCity(String cityName, NewWeatherDTO newWeatherDTO) {
+        CityDTO city = getCityByName(cityName);
+        WeatherDTO currentWeather = getWeatherByCityAndDatetime(city, newWeatherDTO.getDateTime());
         if(currentWeather == null) {
-            return saveWeatherForCity(cityName, weatherDTO);
+            return saveWeatherForCity(cityName, newWeatherDTO);
         }
-        return updateExistingWeather(currentWeather, weatherDTO);
+        return updateExistingWeather(currentWeather, newWeatherDTO);
     }
 
-    public WeatherEntity updateExistingWeather(WeatherEntity currentWeather, WeatherDTO weatherDTO) {
+    public WeatherDTO updateExistingWeather(WeatherDTO currentWeather, NewWeatherDTO newWeatherDTO) {
         final String updateWeatherQuery = "UPDATE weather SET temperature = ?, handbook_id = ? WHERE id = ?";
         try {
-            jdbcTemplate.update(updateWeatherQuery, weatherDTO.getTemp_val(), weatherDTO.getHandbook_id(),
+            jdbcTemplate.update(updateWeatherQuery, newWeatherDTO.getTemp_val(), newWeatherDTO.getHandbook_id(),
                     currentWeather.getId());
-            return new WeatherEntity(currentWeather.getId(), weatherDTO.getTemp_val(),
-                    currentWeather.getCity(), weatherDTO.getDateTime(),
-                    getHandbookById(weatherDTO.getHandbook_id())
+            return new WeatherDTO(currentWeather.getId(), newWeatherDTO.getTemp_val(),
+                    newWeatherDTO.getDateTime(), currentWeather.getCity(),
+                    getHandbookDTOById(newWeatherDTO.getHandbook_id())
             );
         } catch (DataAccessException exception) {
             throw new WeatherSqlException(exception.getMessage());
         }
     }
 
-    private WeatherEntity getWeatherByCityAndDatetime(CityEntity city, LocalDateTime dateTime) {
+    private WeatherDTO getWeatherByCityAndDatetime(CityDTO city, LocalDateTime dateTime) {
         final String getWeatherByCityAndDatetimeQuery = "SELECT * FROM weather WHERE city_id = ? AND date_time = ?";
         try {
-            List<WeatherEntity> results = jdbcTemplate.query(
+            List<WeatherDTO> results = jdbcTemplate.query(
                     getWeatherByCityAndDatetimeQuery,
                     (rs, rowNum) -> mapWeather(rs),
                     city.getId(), Timestamp.valueOf(dateTime)
@@ -120,35 +120,34 @@ public class WeatherServiceJdbcImpl implements WeatherService {
         }
     }
 
-    private WeatherEntity mapWeather(ResultSet rs) throws SQLException {
+    private WeatherDTO mapWeather(ResultSet rs) throws SQLException {
         UUID id = UUID.fromString(rs.getString("id"));
         double temperature = rs.getDouble("temperature");
         LocalDateTime dateTime = rs.getTimestamp("date_time").toLocalDateTime();
         int handbook_id = rs.getInt("handbook_id");
         UUID city_id = (UUID) rs.getObject("city_id");
-        return new WeatherEntity(id, temperature, getCityById(city_id),
-                dateTime, getHandbookById(handbook_id));
+        return new WeatherDTO(id, temperature, dateTime, getCityById(city_id), getHandbookDTOById(handbook_id));
     }
 
-    private HandbookEntity getHandbookById(int handbook_id) {
-        return handbookService.findById(handbook_id);
-    }
-
-    private CityEntity getCityByName(String cityName) {
+    private CityDTO getCityByName(String cityName) {
         return cityService.findCityByName(cityName);
     }
 
-    private CityEntity getCityById(UUID cityId) {
+    private CityDTO getCityById(UUID cityId) {
         return cityService.findCityById(cityId);
     }
 
     public void deleteAllByCityName(String cityName) {
         final String deleteWeatherByDateTimeQuery = "DELETE FROM weather WHERE city_id = ?";
-        CityEntity city = getCityByName(cityName);
+        CityDTO city = getCityByName(cityName);
         try {
             jdbcTemplate.update(deleteWeatherByDateTimeQuery, city.getId());
         } catch (DataAccessException exception) {
             throw new WeatherSqlException(exception.getMessage());
         }
+    }
+
+    private HandbookDTO getHandbookDTOById(Integer id) {
+        return handbookService.findById(id);
     }
 }

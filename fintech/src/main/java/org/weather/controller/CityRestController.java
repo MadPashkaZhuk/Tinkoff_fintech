@@ -8,7 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 import org.weather.dto.CityDTO;
-import org.weather.entity.CityEntity;
+import org.weather.dto.NewCityDTO;
 import org.weather.service.CityService;
 
 import java.util.List;
@@ -29,7 +29,7 @@ public class CityRestController {
             @ApiResponse(responseCode = "200", description = "All information is shown")
     })
     @GetMapping
-    public ResponseEntity<List<CityEntity>> getCities() {
+    public ResponseEntity<List<CityDTO>> getCities() {
         return ResponseEntity.ok()
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(cityService.findAll());
@@ -41,7 +41,7 @@ public class CityRestController {
             @ApiResponse(responseCode = "404", description = "City with this id doesn't exist in database")
     })
     @GetMapping("/{id}")
-    public ResponseEntity<CityEntity> getCityById(@PathVariable("id") UUID id) {
+    public ResponseEntity<CityDTO> getCityById(@PathVariable("id") UUID id) {
         return ResponseEntity.ok()
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(cityService.findCityById(id));
@@ -53,7 +53,7 @@ public class CityRestController {
             @ApiResponse(responseCode = "404", description = "City with this id doesn't exist in database")
     })
     @GetMapping("/name/{cityName}")
-    public ResponseEntity<CityEntity> getCityByName(@PathVariable("cityName") String cityName) {
+    public ResponseEntity<CityDTO> getCityByName(@PathVariable("cityName") String cityName) {
         return ResponseEntity.ok()
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(cityService.findCityByName(cityName));
@@ -65,7 +65,7 @@ public class CityRestController {
             @ApiResponse(responseCode = "400", description = "City with this name already created")
     })
     @PostMapping("/{cityName}")
-    public ResponseEntity<CityEntity> saveCity(@PathVariable("cityName") String cityName,
+    public ResponseEntity<CityDTO> saveCity(@PathVariable("cityName") String cityName,
                                                UriComponentsBuilder uriComponentsBuilder) {
         return ResponseEntity.created(uriComponentsBuilder
                         .path("/cities/name/{cityName}")
@@ -80,14 +80,14 @@ public class CityRestController {
             @ApiResponse(responseCode = "201", description = "City updated successfully")
     })
     @PutMapping("/{cityName}")
-    public ResponseEntity<CityEntity> updateCity(@PathVariable("cityName") String cityName,
-                                                 @RequestBody CityDTO cityDTO,
+    public ResponseEntity<CityDTO> updateCity(@PathVariable("cityName") String cityName,
+                                                 @RequestBody NewCityDTO newCityDTO,
                                                  UriComponentsBuilder uriComponentsBuilder) {
         return ResponseEntity.created(uriComponentsBuilder
                     .path("/cities/name/{cityName}")
-                    .build(Map.of("cityName", cityDTO.getNewName())))
+                    .build(Map.of("cityName", newCityDTO.getNewName())))
                 .contentType(MediaType.APPLICATION_JSON)
-                .body(cityService.update(cityName, cityDTO));
+                .body(cityService.update(cityName, newCityDTO));
 
     }
     @Operation(summary = "Delete city in database",

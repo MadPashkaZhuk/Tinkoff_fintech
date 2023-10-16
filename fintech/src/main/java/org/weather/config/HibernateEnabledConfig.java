@@ -10,6 +10,7 @@ import org.weather.dao.hibernate.WeatherServiceImpl;
 import org.weather.repository.CityRepository;
 import org.weather.repository.HandbookRepository;
 import org.weather.repository.WeatherRepository;
+import org.weather.utils.EntityMapper;
 import org.weather.utils.MessageSourceWrapper;
 
 @Configuration
@@ -17,20 +18,22 @@ import org.weather.utils.MessageSourceWrapper;
 public class HibernateEnabledConfig {
     @Bean
     public CityServiceImpl cityService(CityRepository cityRepository, WeatherServiceImpl weatherServiceImpl,
-                                   MessageSourceWrapper messageSourceWrapper) {
-        return new CityServiceImpl(cityRepository, weatherServiceImpl, messageSourceWrapper);
+                                       MessageSourceWrapper messageSourceWrapper, EntityMapper entityMapper) {
+        return new CityServiceImpl(cityRepository, weatherServiceImpl, messageSourceWrapper, entityMapper);
     }
     @Bean
     public HandbookServiceImpl handbookService(HandbookRepository handbookRepository,
-                                           MessageSourceWrapper messageSourceWrapper) {
-        return new HandbookServiceImpl(handbookRepository, messageSourceWrapper);
+                                               MessageSourceWrapper messageSourceWrapper,
+                                               EntityMapper entityMapper) {
+        return new HandbookServiceImpl(handbookRepository, messageSourceWrapper, entityMapper);
     }
     @Bean
     public WeatherServiceImpl weatherService(WeatherRepository weatherRepository,
-                                         @Lazy CityServiceImpl cityServiceImpl,
-                                         HandbookServiceImpl handbookServiceImpl,
-                                         MessageSourceWrapper messageSourceWrapper) {
+                                             @Lazy CityServiceImpl cityServiceImpl,
+                                             HandbookServiceImpl handbookServiceImpl,
+                                             MessageSourceWrapper messageSourceWrapper,
+                                             EntityMapper entityMapper) {
         return new WeatherServiceImpl(weatherRepository, cityServiceImpl,
-                handbookServiceImpl, messageSourceWrapper);
+                handbookServiceImpl, messageSourceWrapper, entityMapper);
     }
 }

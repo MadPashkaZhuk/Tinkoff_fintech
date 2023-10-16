@@ -9,6 +9,7 @@ import org.weather.dao.jdbc.HandbookServiceJdbcImpl;
 import org.weather.dao.jdbc.WeatherServiceJdbcImpl;
 import org.weather.service.CityService;
 import org.weather.service.HandbookService;
+import org.weather.utils.EntityMapper;
 import org.weather.utils.MessageSourceWrapper;
 
 import javax.sql.DataSource;
@@ -17,17 +18,21 @@ import javax.sql.DataSource;
 @Profile("hibernate-disabled")
 public class HibernateDisabledConfig {
     @Bean
-    public CityService cityServiceJdbcImplHibernateDisabled(DataSource dataSource, MessageSourceWrapper messageSourceWrapper,
-                                           WeatherServiceJdbcImpl weatherServiceJdbc) {
-        return new CityServiceJdbcImpl(dataSource, messageSourceWrapper, weatherServiceJdbc);
+    public CityService cityServiceJdbcImplHibernateDisabled(DataSource dataSource,
+                                                            MessageSourceWrapper messageSourceWrapper,
+                                                            WeatherServiceJdbcImpl weatherServiceJdbc,
+                                                            EntityMapper entityMapper) {
+        return new CityServiceJdbcImpl(dataSource, messageSourceWrapper, weatherServiceJdbc, entityMapper);
     }
     @Bean
-    public HandbookService handbookServiceHibernateDisabled(DataSource dataSource) {
-        return new HandbookServiceJdbcImpl(dataSource);
+    public HandbookService handbookServiceHibernateDisabled(DataSource dataSource,
+                                                            EntityMapper entityMapper) {
+        return new HandbookServiceJdbcImpl(dataSource, entityMapper);
     }
     @Bean
-    public WeatherServiceJdbcImpl weatherServiceHibernateDisabled(DataSource dataSource, @Lazy CityService cityService,
-                                         HandbookService handbookService) {
+    public WeatherServiceJdbcImpl weatherServiceHibernateDisabled(DataSource dataSource,
+                                                                  @Lazy CityService cityService,
+                                                                  HandbookService handbookService) {
         return new WeatherServiceJdbcImpl(dataSource, cityService, handbookService);
     }
 }
