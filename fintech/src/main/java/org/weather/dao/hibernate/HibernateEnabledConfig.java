@@ -1,12 +1,9 @@
-package org.weather.config;
+package org.weather.dao.hibernate;
 
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Lazy;
-import org.springframework.context.annotation.Profile;
-import org.weather.dao.hibernate.CityServiceImpl;
-import org.weather.dao.hibernate.HandbookServiceImpl;
-import org.weather.dao.hibernate.WeatherServiceImpl;
 import org.weather.repository.CityRepository;
 import org.weather.repository.HandbookRepository;
 import org.weather.repository.WeatherRepository;
@@ -14,7 +11,7 @@ import org.weather.utils.EntityMapper;
 import org.weather.utils.MessageSourceWrapper;
 
 @Configuration
-@Profile("hibernate-enabled")
+@ConditionalOnProperty(value = "hibernate.enabled", havingValue = "true")
 public class HibernateEnabledConfig {
     @Bean
     public CityServiceImpl cityService(CityRepository cityRepository, WeatherServiceImpl weatherServiceImpl,
