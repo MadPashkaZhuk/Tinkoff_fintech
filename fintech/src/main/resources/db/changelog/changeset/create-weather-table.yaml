@@ -1,0 +1,39 @@
+databaseChangeLog:
+  - changeSet:
+      id: create-weather
+      author: Paul
+      changes:
+        - createTable:
+            tableName: weather
+            columns:
+              - column:
+                  name: id
+                  type: uuid
+                  autoIncrement: false
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: temperature
+                  type: double
+                  constraints:
+                    nullable: false
+              - column:
+                  name: city_id
+                  type: uuid
+                  constraints:
+                    foreignKeyName: city_weather_fk
+                    referencedTableName: city
+                    referencedColumnNames: id
+              - column:
+                  name: handbook_id
+                  type: int
+                  constraints:
+                    foreignKeyName: handbook_weather_fk
+                    referencedTableName: handbook
+                    referencedColumnNames: id
+              - column:
+                  name: date_time
+                  type: datetime
+                  constraints:
+                    nullable: false

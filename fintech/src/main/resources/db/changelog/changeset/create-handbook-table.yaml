@@ -1,0 +1,20 @@
+databaseChangeLog:
+  - changeSet:
+      id: create-handbook
+      author: Paul
+      changes:
+        - createTable:
+            tableName: handbook
+            columns:
+              - column:
+                  name: id
+                  type: int
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: type
+                  type: varchar(200)
+                  constraints:
+                    nullable: false

@@ -1,4 +1,4 @@
-package org.weather.client;
+package org.weather.properties;
 
 import jakarta.validation.constraints.NotEmpty;
 import lombok.Getter;

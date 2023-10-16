@@ -1,0 +1,63 @@
+databaseChangeLog:
+  - changeSet:
+      id: insert-cities
+      author: Paul
+      changes:
+        - insert:
+            tableName: city
+            columns:
+              - column:
+                  name: id
+                  valueComputed: 'random_uuid()'
+              - column:
+                  name: name
+                  value: 'Minsk'
+
+        - insert:
+            tableName: city
+            columns:
+              - column:
+                  name: id
+                  valueComputed: 'random_uuid()'
+              - column:
+                  name: name
+                  value: 'Brest'
+
+        - insert:
+            tableName: city
+            columns:
+              - column:
+                  name: id
+                  valueComputed: 'random_uuid()'
+              - column:
+                  name: name
+                  value: 'Vitebsk'
+        - insert:
+            tableName: city
+            columns:
+              - column:
+                  name: id
+                  valueComputed: 'random_uuid()'
+              - column:
+                  name: name
+                  value: 'Homel'
+
+        - insert:
+            tableName: city
+            columns:
+              - column:
+                  name: id
+                  valueComputed: 'random_uuid()'
+              - column:
+                  name: name
+                  value: 'Hrodna'
+
+        - insert:
+            tableName: city
+            columns:
+              - column:
+                  name: id
+                  valueComputed: 'random_uuid()'
+              - column:
+                  name: name
+                  value: 'Mahileu'
