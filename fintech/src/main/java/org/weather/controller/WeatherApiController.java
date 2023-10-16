@@ -14,6 +14,7 @@ import org.weather.client.WeatherApiRestClient;
 @RequestMapping("/external/weatherapi")
 public class WeatherApiController {
     private final WeatherApiRestClient weatherApiRestClient;
+
     public WeatherApiController(WeatherApiRestClient weatherApiRestClient) {
         this.weatherApiRestClient = weatherApiRestClient;
     }

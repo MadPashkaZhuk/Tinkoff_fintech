@@ -1,0 +1,13 @@
+databaseChangeLog:
+  - include:
+      file: db/changelog/changeset/create-city-table.yaml
+  - include:
+      file: db/changelog/changeset/create-handbook-table.yaml
+  - include:
+      file: db/changelog/changeset/create-weather-table.yaml
+  - include:
+      file: db/changelog/changeset/insert-handbook-table.yaml
+  - include:
+      file: db/changelog/changeset/insert-city-table.yaml
+  - include:
+      file: db/changelog/changeset/insert-weather-table.yaml

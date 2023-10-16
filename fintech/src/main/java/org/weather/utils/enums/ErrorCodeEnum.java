@@ -4,8 +4,11 @@ import lombok.Getter;
 
 @Getter
 public enum ErrorCodeEnum {
-    TOO_MANY_REQUESTS(7777),
-    UNKNOWN_ERROR_CODE(8888);
+    API_KEY_DISABLED(1111),
+    INVALID_URL(2222),
+    API_KEY_INVALID(3333),
+    TOO_MANY_REQUESTS(4444),
+    UNKNOWN_ERROR_CODE(5555);
     private final int code;
     ErrorCodeEnum(int code) {
         this.code = code;

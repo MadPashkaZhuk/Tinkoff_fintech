@@ -1,0 +1,75 @@
+databaseChangeLog:
+  - changeSet:
+      id: insert-weather-for-minsk
+      author: Paul
+      changes:
+        - sql:
+            sql: INSERT INTO weather (id, temperature, city_id, handbook_id, date_time)
+              SELECT
+              random_uuid(),
+              25.0,
+              c.id as city_id,
+              h.id as handbook_id,
+              '2023-10-15T12:00:00'
+              FROM city c
+              JOIN handbook h ON h.type = 'sunshine'
+              WHERE c.name = 'Minsk';
+
+        - sql:
+            sql: INSERT INTO weather (id, temperature, city_id, handbook_id, date_time)
+              SELECT
+              random_uuid(),
+              -5,
+              c.id as city_id,
+              h.id as handbook_id,
+              '2023-10-16T12:00:00'
+              FROM city c
+              JOIN handbook h ON h.type = 'snowing'
+              WHERE c.name = 'Minsk';
+        - sql:
+            sql: INSERT INTO weather (id, temperature, city_id, handbook_id, date_time)
+              SELECT
+              random_uuid(),
+              16.4,
+              c.id as city_id,
+              h.id as handbook_id,
+              '2023-10-17T12:00:00'
+              FROM city c
+              JOIN handbook h ON h.type = 'raining'
+              WHERE c.name = 'Minsk';
+
+        - sql:
+            sql: INSERT INTO weather (id, temperature, city_id, handbook_id, date_time)
+              SELECT
+              random_uuid(),
+              -22,
+              c.id as city_id,
+              h.id as handbook_id,
+              '2023-10-15T12:00:00'
+              FROM city c
+              JOIN handbook h ON h.type = 'snowing'
+              WHERE c.name = 'Brest';
+
+        - sql:
+            sql: INSERT INTO weather (id, temperature, city_id, handbook_id, date_time)
+              SELECT
+              random_uuid(),
+              17.3,
+              c.id as city_id,
+              h.id as handbook_id,
+              '2023-10-16T12:00:00'
+              FROM city c
+              JOIN handbook h ON h.type = 'snowing'
+              WHERE c.name = 'Brest';
+
+        - sql:
+            sql: INSERT INTO weather (id, temperature, city_id, handbook_id, date_time)
+              SELECT
+              random_uuid(),
+              35,
+              c.id as city_id,
+              h.id as handbook_id,
+              '2023-10-17T12:00:00'
+              FROM city c
+              JOIN handbook h ON h.type = 'sunshine'
+              WHERE c.name = 'Brest';

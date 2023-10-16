@@ -1,20 +1,34 @@
 package org.weather.repository;
 
-import org.weather.dto.WeatherDTO;
-import org.weather.entity.Weather;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
+import org.weather.entity.CityEntity;
+import org.weather.entity.HandbookEntity;
+import org.weather.entity.WeatherEntity;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 
-public interface WeatherRepository {
-    Map<String, List<Weather>> findAll();
-    List<Weather> findById(UUID id);
-    void saveRegion(String regionName);
-    void saveWeather(String regionName, WeatherDTO newWeatherDTO);
-    UUID getIdByRegionName(String regionName);
-    void updateWeatherWithSameRegionAndDate(UUID id, String regionName, WeatherDTO newWeatherDTO);
-    void deleteRegion(UUID currentId, String regionName);
-    boolean hasWeatherWithSameIdAndDate(UUID id, LocalDateTime dateTime);
+@Repository
+public interface WeatherRepository extends JpaRepository<WeatherEntity, UUID> {
+    List<WeatherEntity> findWeatherByCity(CityEntity city);
+    @Modifying
+    @Query("DELETE FROM WeatherEntity w WHERE w.city = :city AND w.datetime = :dateTime")
+    @Transactional
+    void deleteWeatherByCityAndDatetime(@Param("city") CityEntity city, @Param("dateTime") LocalDateTime dateTime);
+
+    @Modifying
+    @Query("UPDATE WeatherEntity w SET w.temp_c = :temperature, w.handbook = :handbook WHERE w.id = :weatherId")
+    @Transactional
+    void updateWeatherById(@Param("weatherId") UUID weatherId, @Param("temperature") double temperature,
+                           @Param("handbook") HandbookEntity handbook);
+    @Transactional
+    void deleteAllByCity(CityEntity city);
+    WeatherEntity getWeatherByCityAndDatetime(CityEntity city, LocalDateTime dateTime);
 }

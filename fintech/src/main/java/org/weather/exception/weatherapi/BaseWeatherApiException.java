@@ -2,7 +2,6 @@ package org.weather.exception.weatherapi;
 
 import lombok.Getter;
 import org.springframework.http.HttpStatus;
-import org.weather.exception.BaseWeatherException;
 
 @Getter
 public class BaseWeatherApiException extends RuntimeException {
