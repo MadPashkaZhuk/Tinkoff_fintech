@@ -11,7 +11,6 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 import org.weather.dto.weatherapi.WeatherApiDTO;
 import org.weather.exception.weatherapi.*;
-import org.weather.properties.ClientProperties;
 import org.weather.utils.WeatherApiMapper;
 import org.weather.utils.ErrorCodeHelper;
 import org.weather.utils.MessageSourceWrapper;

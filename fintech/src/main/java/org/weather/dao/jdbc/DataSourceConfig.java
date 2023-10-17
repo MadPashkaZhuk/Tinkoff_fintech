@@ -1,10 +1,9 @@
-package org.weather.config;
+package org.weather.dao.jdbc;
 
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.weather.properties.JdbcDataSourceProperties;
 
 import javax.sql.DataSource;
 
