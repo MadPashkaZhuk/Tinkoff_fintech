@@ -1,0 +1,13 @@
+databaseChangeLog:
+  - changeSet:
+      id: create-composite-index-city-date-for-weather
+      author: Paul
+      changes:
+        - createIndex:
+            indexName: city-date-composite-index-for-weather
+            tableName: weather
+            columns:
+              - column:
+                  name: city_id
+              - column:
+                  name: date_time
