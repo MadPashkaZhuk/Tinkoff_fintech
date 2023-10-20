@@ -55,7 +55,6 @@ public class CityServiceImpl implements CityService {
         return mapCityEntityToDTO(city.get());
     }
 
-    @Transactional(isolation = Isolation.READ_COMMITTED)
     public void delete(String cityName) {
         if(hasCityWithName(cityName)) {
             weatherServiceImpl.deleteAll(cityName);
