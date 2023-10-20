@@ -30,9 +30,22 @@ public class WeatherApiDTO {
     @Value
     public static class Current {
         double temperatureInCelsius;
+        Condition condition;
+
         @JsonCreator
-        public Current(@JsonProperty("temp_c") double temperatureInCelsius) {
+        public Current(@JsonProperty("temp_c") double temperatureInCelsius,
+                       @JsonProperty("condition") Condition condition) {
             this.temperatureInCelsius = temperatureInCelsius;
+            this.condition = condition;
+        }
+
+        @Value
+        public static class Condition {
+            String text;
+            @JsonCreator
+            public Condition(@JsonProperty("text") String text) {
+                this.text = text;
+            }
         }
     }
 

@@ -21,8 +21,9 @@ public class HibernateDisabledConfig {
     }
     @Bean
     public HandbookServiceJdbcImpl handbookServiceHibernateDisabled(DataSource dataSource,
-                                                            EntityMapper entityMapper) {
-        return new HandbookServiceJdbcImpl(dataSource, entityMapper);
+                                                                    EntityMapper entityMapper,
+                                                                    MessageSourceWrapper messageSourceWrapper) {
+        return new HandbookServiceJdbcImpl(dataSource, entityMapper, messageSourceWrapper);
     }
     @Bean
     public WeatherServiceJdbcImpl weatherServiceHibernateDisabled(DataSource dataSource,

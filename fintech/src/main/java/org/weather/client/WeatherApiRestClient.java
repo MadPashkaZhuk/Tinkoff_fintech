@@ -63,6 +63,31 @@ public class WeatherApiRestClient {
         }
     }
 
+    @RateLimiter(name = "weatherApiCurrent")
+    public WeatherApiDTO getDTOFromWeatherApi(String regionName) {
+        ResponseEntity<WeatherApiDTO> responseEntity;
+        String finalPath = UriComponentsBuilder.fromUriString(clientProperties.getUrl())
+                .queryParam("key", clientProperties.getKey())
+                .queryParam("q", regionName)
+                .queryParam("aqi", "no")
+                .toUriString();
+        try {
+            responseEntity = restTemplate.exchange(
+                    finalPath,
+                    HttpMethod.GET,
+                    null,
+                    WeatherApiDTO.class
+            );
+            return responseEntity.getBody();
+        } catch (HttpStatusCodeException ex) {
+            throw getWeatherApiExceptionFromHttpException(ex);
+        } catch (Throwable ex) {
+            throw new WeatherApiUnknownException(HttpStatus.INTERNAL_SERVER_ERROR,
+                    messageSource.getMessageCode(WeatherMessageEnum.UNKNOWN_EXCEPTION),
+                    errorCodeHelper.getCode(ErrorCodeEnum.UNKNOWN_ERROR_CODE));
+        }
+    }
+
     private BaseWeatherApiException getWeatherApiExceptionFromHttpException(HttpStatusCodeException ex) {
         BaseWeatherApiException exception;
         if(ex.getStatusCode() == HttpStatus.BAD_REQUEST) {
