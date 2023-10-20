@@ -3,10 +3,6 @@ package org.weather.dao.jdbc;
 import org.springframework.dao.DataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.transaction.PlatformTransactionManager;
-import org.springframework.transaction.TransactionDefinition;
-import org.springframework.transaction.support.TransactionCallback;
-import org.springframework.transaction.support.TransactionTemplate;
 import org.weather.dto.HandbookDTO;
 import org.weather.entity.HandbookEntity;
 import org.weather.exception.handbook.HandbookAlreadyExistsException;
@@ -16,6 +12,7 @@ import org.weather.exception.sql.HandbookSqlException;
 import org.weather.service.HandbookService;
 import org.weather.utils.EntityMapper;
 import org.weather.utils.MessageSourceWrapper;
+import org.weather.utils.TransactionManagerHelper;
 import org.weather.utils.enums.WeatherMessageEnum;
 
 import javax.sql.DataSource;
@@ -25,21 +22,20 @@ public class HandbookServiceJdbcImpl implements HandbookService {
     private final JdbcTemplate jdbcTemplate;
     private final EntityMapper entityMapper;
     private final MessageSourceWrapper messageSourceWrapper;
-    private final PlatformTransactionManager transactionManager;
+    private final TransactionManagerHelper transactionManagerHelper;
 
     public HandbookServiceJdbcImpl(DataSource dataSource,
                                    EntityMapper entityMapper,
-                                   MessageSourceWrapper messageSourceWrapper,
-                                   PlatformTransactionManager transactionManager) {
+                                   MessageSourceWrapper messageSourceWrapper, TransactionManagerHelper transactionManagerHelper) {
         this.jdbcTemplate = new JdbcTemplate(dataSource);
         this.entityMapper = entityMapper;
         this.messageSourceWrapper = messageSourceWrapper;
-        this.transactionManager = transactionManager;
+        this.transactionManagerHelper = transactionManagerHelper;
     }
 
     @Override
     public HandbookDTO save(String weatherType) {
-        return executeInReadCommittedTransaction(status -> {
+        return transactionManagerHelper.executeInReadCommittedTransaction(status -> {
             if (hasHandbookWithType(weatherType)) {
                 throw new HandbookAlreadyExistsException(HttpStatus.BAD_REQUEST,
                         messageSourceWrapper.getMessageCode(WeatherMessageEnum.HANDBOOK_ALREADY_EXISTS));
@@ -64,7 +60,7 @@ public class HandbookServiceJdbcImpl implements HandbookService {
 
     @Override
     public List<HandbookDTO> findAll() {
-        return executeInReadCommittedTransaction(status -> {
+        return transactionManagerHelper.executeInReadCommittedTransaction(status -> {
             String findAllQuery = "SELECT * FROM handbook";
             try {
                 return mapHandbookEntityListToDtoList(jdbcTemplate.query(findAllQuery, (rs, rowNum) -> {
@@ -81,7 +77,7 @@ public class HandbookServiceJdbcImpl implements HandbookService {
 
     @Override
     public HandbookDTO findById(Integer id) {
-        return executeInReadCommittedTransaction(status -> {
+        return transactionManagerHelper.executeInReadCommittedTransaction(status -> {
             String findByIdQuery = "SELECT * FROM handbook WHERE id = ?";
             try {
                 return mapHandbookEntityToDTO(jdbcTemplate.queryForObject(findByIdQuery, (rs, rowNum) -> {
@@ -97,7 +93,7 @@ public class HandbookServiceJdbcImpl implements HandbookService {
     }
 
     public HandbookEntity getHandbookEntityByTypeFromRepo(String weatherType) {
-        return executeInReadCommittedTransaction(status -> {
+        return transactionManagerHelper.executeInReadCommittedTransaction(status -> {
             String findHandbookByTypeQuery = "SELECT * FROM handbook WHERE type = ?";
             try {
                 List<HandbookEntity> handbooks = jdbcTemplate.query(findHandbookByTypeQuery, (rs, rowNum) -> {
@@ -115,12 +111,6 @@ public class HandbookServiceJdbcImpl implements HandbookService {
                 throw new CitySqlException(exception.getMessage());
             }
         });
-    }
-
-    private <T> T executeInReadCommittedTransaction(TransactionCallback<T> callback) {
-        TransactionTemplate transactionTemplate = new TransactionTemplate(transactionManager);
-        transactionTemplate.setIsolationLevel(TransactionDefinition.ISOLATION_READ_COMMITTED);
-        return transactionTemplate.execute(callback);
     }
 
     public HandbookDTO mapHandbookEntityToDTO(HandbookEntity handbookEntity) {

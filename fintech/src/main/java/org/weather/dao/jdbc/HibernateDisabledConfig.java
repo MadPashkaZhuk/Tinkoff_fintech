@@ -7,6 +7,7 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.weather.utils.EntityMapper;
 import org.weather.utils.MessageSourceWrapper;
+import org.weather.utils.TransactionManagerHelper;
 
 import javax.sql.DataSource;
 
@@ -18,22 +19,22 @@ public class HibernateDisabledConfig {
                                                                     MessageSourceWrapper messageSourceWrapper,
                                                                     WeatherServiceJdbcImpl weatherServiceJdbc,
                                                                     EntityMapper entityMapper,
-                                                                    PlatformTransactionManager transactionManager) {
+                                                                    TransactionManagerHelper transactionManagerHelper) {
         return new CityServiceJdbcImpl(dataSource, messageSourceWrapper,
-                weatherServiceJdbc, entityMapper, transactionManager);
+                weatherServiceJdbc, entityMapper, transactionManagerHelper);
     }
     @Bean
     public HandbookServiceJdbcImpl handbookServiceHibernateDisabled(DataSource dataSource,
                                                                     EntityMapper entityMapper,
                                                                     MessageSourceWrapper messageSourceWrapper,
-                                                                    PlatformTransactionManager transactionManager) {
-        return new HandbookServiceJdbcImpl(dataSource, entityMapper, messageSourceWrapper, transactionManager);
+                                                                    TransactionManagerHelper transactionManagerHelper) {
+        return new HandbookServiceJdbcImpl(dataSource, entityMapper, messageSourceWrapper, transactionManagerHelper);
     }
     @Bean
     public WeatherServiceJdbcImpl weatherServiceHibernateDisabled(DataSource dataSource,
                                                                   @Lazy CityServiceJdbcImpl cityService,
                                                                   HandbookServiceJdbcImpl handbookService,
-                                                                  PlatformTransactionManager transactionManager) {
-        return new WeatherServiceJdbcImpl(dataSource, cityService, handbookService, transactionManager);
+                                                                  TransactionManagerHelper transactionManagerHelper) {
+        return new WeatherServiceJdbcImpl(dataSource, cityService, handbookService, transactionManagerHelper);
     }
 }

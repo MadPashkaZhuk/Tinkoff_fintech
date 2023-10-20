@@ -3,12 +3,8 @@ package org.weather.dao.jdbc;
 import org.springframework.dao.DataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.transaction.PlatformTransactionManager;
-import org.springframework.transaction.TransactionDefinition;
 import org.springframework.transaction.TransactionStatus;
-import org.springframework.transaction.support.TransactionCallback;
 import org.springframework.transaction.support.TransactionCallbackWithoutResult;
-import org.springframework.transaction.support.TransactionTemplate;
 import org.weather.dto.CityDTO;
 import org.weather.dto.NewCityDTO;
 import org.weather.entity.CityEntity;
@@ -18,6 +14,7 @@ import org.weather.exception.sql.CitySqlException;
 import org.weather.service.CityService;
 import org.weather.utils.EntityMapper;
 import org.weather.utils.MessageSourceWrapper;
+import org.weather.utils.TransactionManagerHelper;
 import org.weather.utils.enums.WeatherMessageEnum;
 
 import javax.sql.DataSource;
@@ -29,18 +26,16 @@ public class CityServiceJdbcImpl implements CityService {
     private final MessageSourceWrapper messageSourceWrapper;
     private final WeatherServiceJdbcImpl weatherServiceJdbc;
     private final EntityMapper entityMapper;
-    private final PlatformTransactionManager transactionManager;
-
+    private final TransactionManagerHelper transactionManagerHelper;
     public CityServiceJdbcImpl(DataSource dataSource,
                                MessageSourceWrapper messageSourceWrapper,
                                WeatherServiceJdbcImpl weatherServiceJdbc,
-                               EntityMapper entityMapper,
-                               PlatformTransactionManager transactionManager) {
+                               EntityMapper entityMapper, TransactionManagerHelper transactionManagerHelper) {
         this.jdbcTemplate = new JdbcTemplate(dataSource);
         this.messageSourceWrapper = messageSourceWrapper;
         this.weatherServiceJdbc = weatherServiceJdbc;
         this.entityMapper = entityMapper;
-        this.transactionManager = transactionManager;
+        this.transactionManagerHelper = transactionManagerHelper;
     }
 
     @Override
@@ -49,7 +44,7 @@ public class CityServiceJdbcImpl implements CityService {
             throw new CityAlreadyExistsException(HttpStatus.BAD_REQUEST,
                     messageSourceWrapper.getMessageCode(WeatherMessageEnum.CITY_ALREADY_EXISTS));
         }
-        return executeInReadCommittedTransaction(status -> {
+        return transactionManagerHelper.executeInReadCommittedTransaction(status -> {
             String insertQuery = "INSERT INTO city (id, name) VALUES (?, ?)";
             UUID newId = UUID.randomUUID();
             try {
@@ -66,7 +61,7 @@ public class CityServiceJdbcImpl implements CityService {
         if(!hasCityWithName(cityName)){
             return;
         }
-        executeInReadCommittedTransaction(new TransactionCallbackWithoutResult() {
+        transactionManagerHelper.executeInReadCommittedTransaction(new TransactionCallbackWithoutResult() {
             @Override
             protected void doInTransactionWithoutResult(TransactionStatus status) {
                 String deleteQuery = "DELETE FROM city WHERE id = ?";
@@ -83,7 +78,7 @@ public class CityServiceJdbcImpl implements CityService {
 
     @Override
     public List<CityDTO> findAll() {
-        return executeInReadCommittedTransaction(status -> {
+        return transactionManagerHelper.executeInReadCommittedTransaction(status -> {
             String findAllQuery = "SELECT * FROM city";
             try {
                 return mapCityEntityListToDtoList(jdbcTemplate.query(findAllQuery, (rs, rowNum) -> {
@@ -99,7 +94,7 @@ public class CityServiceJdbcImpl implements CityService {
 
     @Override
     public CityDTO findCityById(UUID id) {
-        return executeInReadCommittedTransaction(status -> {
+        return transactionManagerHelper.executeInReadCommittedTransaction(status -> {
             String findCityByIdQuery = "SELECT * FROM city WHERE id = ?";
             try {
                 List<CityEntity> cityOrEmpty = jdbcTemplate.query(findCityByIdQuery, (rs, rowNum) -> {
@@ -121,7 +116,7 @@ public class CityServiceJdbcImpl implements CityService {
 
     @Override
     public CityDTO update(String cityName, NewCityDTO newCityDTO) {
-        return executeInReadCommittedTransaction(status -> {
+        return transactionManagerHelper.executeInReadCommittedTransaction(status -> {
             String updateQuery = "UPDATE city SET name = ? WHERE id = ?";
             CityEntity city = getCityEntityByNameFromRepo(cityName);
             if(hasCityWithName(newCityDTO.getNewName())) {
@@ -142,7 +137,7 @@ public class CityServiceJdbcImpl implements CityService {
     }
 
     public CityEntity getCityEntityByNameFromRepo(String cityName) {
-        return executeInReadCommittedTransaction(status -> {
+        return transactionManagerHelper.executeInReadCommittedTransaction(status -> {
             String findCityByNameQuery = "SELECT * FROM city WHERE name = ?";
             try {
                 List<CityEntity> cities = jdbcTemplate.query(findCityByNameQuery, (rs, rowNum) -> {
@@ -162,11 +157,6 @@ public class CityServiceJdbcImpl implements CityService {
         });
     }
 
-    private <T> T executeInReadCommittedTransaction(TransactionCallback<T> callback) {
-        TransactionTemplate transactionTemplate = new TransactionTemplate(transactionManager);
-        transactionTemplate.setIsolationLevel(TransactionDefinition.ISOLATION_READ_COMMITTED);
-        return transactionTemplate.execute(callback);
-    }
     public CityDTO findCityByName(String cityName) {
         return mapCityEntityToDTO(getCityEntityByNameOrThrowException(cityName));
     }
