@@ -37,7 +37,7 @@ public class WeatherEntity {
 
     @ManyToOne
     @Schema(name = "Handbook", requiredMode = Schema.RequiredMode.REQUIRED,
-            description = "Handbook type, there are 9 of them", example = "sunshine")
+            description = "Handbook type", example = "Sunshine")
     private HandbookEntity handbook;
 
     public WeatherEntity(double temp_c, CityEntity city, LocalDateTime datetime, HandbookEntity handbook) {

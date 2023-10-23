@@ -3,6 +3,7 @@ package org.weather.dao.hibernate;
 import org.springframework.http.HttpStatus;
 import org.weather.dto.HandbookDTO;
 import org.weather.entity.HandbookEntity;
+import org.weather.exception.handbook.HandbookAlreadyExistsException;
 import org.weather.exception.handbook.HandbookTypeNotFoundException;
 import org.weather.repository.HandbookRepository;
 import org.weather.service.HandbookService;
@@ -22,6 +23,26 @@ public class HandbookServiceImpl implements HandbookService {
         this.handbookRepository = handbookRepository;
         this.messageSourceWrapper = messageSourceWrapper;
         this.entityMapper = entityMapper;
+    }
+
+    @Override
+    public HandbookDTO save(String weatherType) {
+        if(hasHandbookWithName(weatherType)) {
+            throw new HandbookAlreadyExistsException(HttpStatus.BAD_REQUEST,
+                    messageSourceWrapper.getMessageCode(WeatherMessageEnum.HANDBOOK_ALREADY_EXISTS));
+        }
+        HandbookEntity handbookEntity = new HandbookEntity();
+        handbookEntity.setWeatherType(weatherType);
+        handbookRepository.save(handbookEntity);
+        return mapHandbookEntityToDTO(handbookEntity);
+    }
+
+    @Override
+    public HandbookDTO getOrCreateByTypeName(String weatherType) {
+        if(hasHandbookWithName(weatherType)) {
+            return getHandbookDTOByType(weatherType);
+        }
+        return save(weatherType);
     }
 
     public List<HandbookDTO> findAll() {
@@ -45,7 +66,15 @@ public class HandbookServiceImpl implements HandbookService {
         return entityMapper.mapHandbookEntityToDTO(handbookEntity);
     }
 
+    public HandbookDTO getHandbookDTOByType(String weatherType) {
+        return entityMapper.mapHandbookEntityToDTO(handbookRepository.getHandbookEntityByWeatherType(weatherType));
+    }
+
     public List<HandbookDTO> mapHandbookEntityListToDtoList(List<HandbookEntity> handbookEntityList) {
         return entityMapper.mapHandbookEntityListToDtoList(handbookEntityList);
+    }
+
+    public boolean hasHandbookWithName(String weatherType) {
+        return handbookRepository.getHandbookEntityByWeatherType(weatherType) != null;
     }
 }

@@ -5,4 +5,6 @@ import org.springframework.stereotype.Repository;
 import org.weather.entity.HandbookEntity;
 
 @Repository
-public interface HandbookRepository extends JpaRepository<HandbookEntity, Integer> {}
+public interface HandbookRepository extends JpaRepository<HandbookEntity, Integer> {
+    HandbookEntity getHandbookEntityByWeatherType(String weatherType);
+}

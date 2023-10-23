@@ -40,7 +40,7 @@ databaseChangeLog:
                   valueComputed: 'random_uuid()'
               - column:
                   name: name
-                  value: 'Homel'
+                  value: 'Gomel'
 
         - insert:
             tableName: city
@@ -50,7 +50,7 @@ databaseChangeLog:
                   valueComputed: 'random_uuid()'
               - column:
                   name: name
-                  value: 'Hrodna'
+                  value: 'Grodno'
 
         - insert:
             tableName: city
@@ -60,4 +60,4 @@ databaseChangeLog:
                   valueComputed: 'random_uuid()'
               - column:
                   name: name
-                  value: 'Mahileu'
+                  value: 'Mogilev'

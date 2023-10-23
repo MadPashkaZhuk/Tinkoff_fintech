@@ -11,3 +11,7 @@ databaseChangeLog:
       file: db/changelog/changeset/insert-city-table.yaml
   - include:
       file: db/changelog/changeset/insert-weather-table.yaml
+  - include:
+      file: db/changelog/changeset/add-city-index-to-weather.yaml
+  - include:
+      file: db/changelog/changeset/add-city-date-composite-index-to-weather.yaml
