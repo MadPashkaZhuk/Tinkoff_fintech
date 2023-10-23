@@ -1,5 +1,6 @@
-package org.weather.properties;
+package org.weather.client;
 
+import jakarta.validation.constraints.NotEmpty;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -10,10 +11,9 @@ import org.springframework.validation.annotation.Validated;
 @Component
 @Getter
 @Setter
-@ConfigurationProperties("spring.datasource")
-public class JdbcDataSourceProperties {
+@ConfigurationProperties(prefix = "weather.api")
+public class ClientProperties {
+    @NotEmpty(message = "Please enter valid key")
+    private String key;
     private String url;
-    private String username;
-    private String password;
-    private String driverClassName;
 }

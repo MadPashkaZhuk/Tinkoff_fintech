@@ -7,61 +7,61 @@ databaseChangeLog:
              columns:
                -  column:
                     name: type
-                    value: sunshine
+                    value: Sunshine
              tableName: handbook
 
         - insert:
             columns:
               - column:
                   name: type
-                  value: cloudy
+                  value: Cloudy
             tableName: handbook
 
         - insert:
             columns:
               - column:
                   name: type
-                  value: partly cloudy
+                  value: Partly cloudy
             tableName: handbook
 
         - insert:
             columns:
               - column:
                   name: type
-                  value: raining
+                  value: Raining
             tableName: handbook
 
         - insert:
             columns:
               - column:
                   name: type
-                  value: snowing
+                  value: Snowing
             tableName: handbook
 
         - insert:
             columns:
               - column:
                   name: type
-                  value: overcast
+                  value: Overcast
             tableName: handbook
 
         - insert:
             columns:
               - column:
                   name: type
-                  value: foggy
+                  value: Foggy
             tableName: handbook
 
         - insert:
             columns:
               - column:
                   name: type
-                  value: thunder&lightning
+                  value: Thunder&lightning
             tableName: handbook
 
         - insert:
             columns:
               - column:
                   name: type
-                  value: windy
+                  value: Windy
             tableName: handbook

@@ -1,6 +1,7 @@
 package org.weather.dao.hibernate;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 import org.weather.dto.CityDTO;
 import org.weather.dto.NewCityDTO;
@@ -54,7 +55,6 @@ public class CityServiceImpl implements CityService {
         return mapCityEntityToDTO(city.get());
     }
 
-    @Transactional
     public void delete(String cityName) {
         if(hasCityWithName(cityName)) {
             weatherServiceImpl.deleteAll(cityName);
@@ -70,7 +70,7 @@ public class CityServiceImpl implements CityService {
         return getCityEntityByName(cityName);
     }
 
-    @Transactional
+    @Transactional(isolation = Isolation.READ_COMMITTED)
     public CityDTO update(String cityName, NewCityDTO newCityDTO) {
         CityEntity city = getCityEntityByName(cityName);
         if(hasCityWithName(newCityDTO.getNewName())) {

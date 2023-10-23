@@ -1,0 +1,11 @@
+databaseChangeLog:
+  - changeSet:
+      id: create-index-city-for-weather
+      author: Paul
+      changes:
+        - createIndex:
+            indexName: city-index-for-weather
+            tableName: weather
+            columns:
+              - column:
+                  name: city_id

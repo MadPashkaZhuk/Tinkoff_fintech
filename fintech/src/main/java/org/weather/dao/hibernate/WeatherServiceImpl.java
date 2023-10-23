@@ -2,6 +2,7 @@ package org.weather.dao.hibernate;
 
 import org.springframework.context.annotation.Lazy;
 import org.springframework.http.HttpStatus;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 import org.weather.dto.CityDTO;
 import org.weather.dto.HandbookDTO;
@@ -56,14 +57,14 @@ public class WeatherServiceImpl implements WeatherService {
         return mapWeatherEntityToDTO(weather);
     }
 
-    @Transactional
+    @Transactional(isolation = Isolation.READ_COMMITTED)
     public void deleteWeatherByDateTime(String cityName, NewWeatherDTO weatherToDelete) {
         CityEntity city = getCityEntityByNameFromRepo(cityName);
         weatherRepository.deleteWeatherByCityAndDatetime(city,
                 weatherToDelete.getDateTime());
     }
 
-    @Transactional
+    @Transactional(isolation = Isolation.READ_COMMITTED)
     public void deleteAll(String cityName){
         CityEntity city = getCityEntityByNameFromRepo(cityName);
         weatherRepository.deleteAllByCity(city);
@@ -73,7 +74,7 @@ public class WeatherServiceImpl implements WeatherService {
         return mapWeatherEntityListToDtoList(weatherRepository.findAll());
     }
 
-    @Transactional
+    @Transactional(isolation = Isolation.READ_COMMITTED)
     public WeatherDTO updateWeatherForCity(String cityName, NewWeatherDTO newWeatherData) {
         if(!cityServiceImpl.hasCityWithName(cityName)) {
             cityServiceImpl.save(cityName);
@@ -86,7 +87,7 @@ public class WeatherServiceImpl implements WeatherService {
         return updateExistingWeather(currentWeather, newWeatherData);
     }
 
-    @Transactional
+    @Transactional(isolation = Isolation.READ_COMMITTED)
     public WeatherDTO updateExistingWeather(WeatherEntity currentWeather, NewWeatherDTO newWeatherData) {
         HandbookEntity handbook = getHandbookEntityById(newWeatherData.getHandbook_id());
         weatherRepository.updateWeatherById(currentWeather.getId(),

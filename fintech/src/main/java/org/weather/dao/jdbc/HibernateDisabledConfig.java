@@ -6,6 +6,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Lazy;
 import org.weather.utils.EntityMapper;
 import org.weather.utils.MessageSourceWrapper;
+import org.weather.utils.TransactionManagerHelper;
 
 import javax.sql.DataSource;
 
@@ -14,20 +15,25 @@ import javax.sql.DataSource;
 public class HibernateDisabledConfig {
     @Bean
     public CityServiceJdbcImpl cityServiceJdbcImplHibernateDisabled(DataSource dataSource,
-                                                            MessageSourceWrapper messageSourceWrapper,
-                                                            WeatherServiceJdbcImpl weatherServiceJdbc,
-                                                            EntityMapper entityMapper) {
-        return new CityServiceJdbcImpl(dataSource, messageSourceWrapper, weatherServiceJdbc, entityMapper);
+                                                                    MessageSourceWrapper messageSourceWrapper,
+                                                                    WeatherServiceJdbcImpl weatherServiceJdbc,
+                                                                    EntityMapper entityMapper,
+                                                                    TransactionManagerHelper transactionManagerHelper) {
+        return new CityServiceJdbcImpl(dataSource, messageSourceWrapper,
+                weatherServiceJdbc, entityMapper, transactionManagerHelper);
     }
     @Bean
     public HandbookServiceJdbcImpl handbookServiceHibernateDisabled(DataSource dataSource,
-                                                            EntityMapper entityMapper) {
-        return new HandbookServiceJdbcImpl(dataSource, entityMapper);
+                                                                    EntityMapper entityMapper,
+                                                                    MessageSourceWrapper messageSourceWrapper,
+                                                                    TransactionManagerHelper transactionManagerHelper) {
+        return new HandbookServiceJdbcImpl(dataSource, entityMapper, messageSourceWrapper, transactionManagerHelper);
     }
     @Bean
     public WeatherServiceJdbcImpl weatherServiceHibernateDisabled(DataSource dataSource,
                                                                   @Lazy CityServiceJdbcImpl cityService,
-                                                                  HandbookServiceJdbcImpl handbookService) {
-        return new WeatherServiceJdbcImpl(dataSource, cityService, handbookService);
+                                                                  HandbookServiceJdbcImpl handbookService,
+                                                                  TransactionManagerHelper transactionManagerHelper) {
+        return new WeatherServiceJdbcImpl(dataSource, cityService, handbookService, transactionManagerHelper);
     }
 }
