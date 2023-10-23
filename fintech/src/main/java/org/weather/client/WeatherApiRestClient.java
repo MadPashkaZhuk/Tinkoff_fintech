@@ -39,8 +39,7 @@ public class WeatherApiRestClient {
 
     @RateLimiter(name = "weatherApiCurrent")
     public double getTemperatureFromWeatherApi(String regionName) {
-        ResponseEntity<WeatherApiDTO> responseEntity = getResponseFromWeatherApi(regionName);
-        WeatherApiDTO weatherApiDTO = responseEntity.getBody();
+        WeatherApiDTO weatherApiDTO = getDTOFromWeatherApi(regionName);
         return weatherApiMapper.getTemperatureFromWeatherApi(weatherApiDTO);
     }
 
