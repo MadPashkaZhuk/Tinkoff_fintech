@@ -5,7 +5,7 @@ plugins {
 }
 
 group 'org.weather'
-version '1.3'
+version '1.4'
 
 java {
     sourceCompatibility = '17'
@@ -46,6 +46,9 @@ dependencies {
     // https://mvnrepository.com/artifact/org.liquibase/liquibase-core
     implementation group: 'org.liquibase', name: 'liquibase-core', version: '4.24.0'
 
+    // https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-test
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+
     // https://mvnrepository.com/artifact/org.projectlombok/lombok
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
@@ -62,4 +65,8 @@ tasks.named("jar") {
 tasks.named("bootJar") {
     archiveClassifier = 'boot'
     archiveBaseName = 'fintech'
+}
+
+tasks.named('test') {
+    useJUnitPlatform()
 }
