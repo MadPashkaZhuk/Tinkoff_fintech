@@ -8,6 +8,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.web.servlet.MockMvc;
 import org.weather.dto.CityDTO;
+import org.weather.exception.city.CityAlreadyExistsException;
 import org.weather.exception.city.CityNotFoundException;
 import org.weather.service.CityService;
 
@@ -17,6 +18,7 @@ import java.util.UUID;
 import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(CityRestController.class)
@@ -78,6 +80,24 @@ public class CityRestControllerTest {
                 .thenThrow(new CityNotFoundException(HttpStatus.NOT_FOUND, "NOT FOUND"));
         mockMvc.perform(get("/cities/" + id))
                 .andExpect(status().isNotFound());
+    }
+
+    @Test
+    public void saveCity_ShouldReturnCreatedStatusAndCityDTO_WhenCityDoesntExist() throws Exception {
+        CityDTO cityDTO = generateCityDTO("Minsk");
+        when(cityService.save("Minsk")).thenReturn(cityDTO);
+        mockMvc.perform(post("/cities/Minsk"))
+                .andExpect(status().isCreated())
+                .andExpect(content().json(objectMapper.writeValueAsString(cityDTO)))
+                .andReturn();
+    }
+
+    @Test
+    public void saveCity_ShouldThrowBadRequest_WhenCityAlreadyExists() throws Exception {
+        when(cityService.save("Test"))
+                .thenThrow(new CityAlreadyExistsException(HttpStatus.BAD_REQUEST, "BAD REQUEST"));
+        mockMvc.perform(post("/cities/Test"))
+                .andExpect(status().isBadRequest());
     }
 
     private CityDTO generateCityDTO(String cityName) {

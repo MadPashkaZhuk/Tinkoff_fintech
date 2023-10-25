@@ -8,6 +8,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.web.servlet.MockMvc;
 import org.weather.dto.HandbookDTO;
+import org.weather.exception.handbook.HandbookAlreadyExistsException;
 import org.weather.exception.handbook.HandbookTypeNotFoundException;
 import org.weather.service.HandbookService;
 
@@ -16,6 +17,7 @@ import java.util.List;
 import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(HandbookRestController.class)
@@ -67,6 +69,23 @@ public class HandbookRestControllerTest {
                thenThrow(new HandbookTypeNotFoundException(HttpStatus.NOT_FOUND, "NOT FOUND"));
        mockMvc.perform(get("/handbook/1"))
                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    public void saveHandbook_ShouldReturnCreatedStatusAndHandbookDTO_WhenHandbookDoesntExist() throws Exception {
+        HandbookDTO handbookDTO = generateHandbookDTO(1, "Sunshine");
+        when(handbookService.save("Sunshine")).thenReturn(handbookDTO);
+        mockMvc.perform(post("/handbook/Sunshine"))
+                .andExpect(status().isCreated())
+                .andExpect(content().json(objectMapper.writeValueAsString(handbookDTO)));
+    }
+
+    @Test
+    public void saveHandbook_ShouldThrowBadRequest_WhenHandbookAlreadyExists() throws Exception {
+        when(handbookService.save("Test"))
+                .thenThrow(new HandbookAlreadyExistsException(HttpStatus.BAD_REQUEST, "BAD REQUEST"));
+        mockMvc.perform(post("/handbook/Test"))
+                .andExpect(status().isBadRequest());
     }
 
     public HandbookDTO generateHandbookDTO(int id, String typeName) {

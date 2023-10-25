@@ -6,10 +6,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.weather.dto.CityDTO;
 import org.weather.dto.HandbookDTO;
+import org.weather.dto.NewWeatherDTO;
 import org.weather.dto.WeatherDTO;
+import org.weather.exception.city.CityNotFoundException;
+import org.weather.exception.handbook.HandbookTypeNotFoundException;
+import org.weather.exception.weather.WeatherAlreadyExistsException;
 import org.weather.exception.weather.WeatherNotFoundException;
 import org.weather.service.WeatherService;
 
@@ -20,6 +25,7 @@ import java.util.UUID;
 import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(WeatherRestController.class)
@@ -86,17 +92,76 @@ public class WeatherRestControllerTest {
                 .andExpect(status().isNotFound());
     }
 
+    @Test
+    public void saveWeather_ShouldReturnCreatedStatusAndWeatherDTO_WhenWeatherDoesntExist() throws Exception {
+        LocalDateTime localDateTime = LocalDateTime.of(2023, 11, 5, 18, 45);
+        NewWeatherDTO newWeatherDTO = generateNewWeatherDTO(15, localDateTime, 1);
+        WeatherDTO weatherDTO = generateWeatherDTO(15,
+                localDateTime,
+                "Minsk",
+                generateHandbookDTO(1, "Raining")
+                );
+        when(weatherService.saveWeatherForCity("Minsk", newWeatherDTO)).thenReturn(weatherDTO);
+        mockMvc.perform(post("/weather/Minsk")
+                        .content(objectMapper.writeValueAsString(newWeatherDTO))
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isCreated())
+                .andExpect(content().json(objectMapper.writeValueAsString(weatherDTO)));
+    }
+
+    @Test
+    public void saveWeather_ShouldThrowNotFound_WhenCityDoesntExist() throws Exception {
+        NewWeatherDTO newWeatherDTO = generateNewWeatherDTO(15,
+                LocalDateTime.of(2023, 11, 5, 18, 45),
+                1);
+        when(weatherService.saveWeatherForCity("Minsk", newWeatherDTO))
+                .thenThrow(new CityNotFoundException(HttpStatus.NOT_FOUND, "NOT FOUND"));
+        mockMvc.perform(post("/weather/Minsk")
+                        .content(objectMapper.writeValueAsString(newWeatherDTO))
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    public void saveWeather_ShouldThrowNotFound_WhenHandbookDoesntExist() throws Exception {
+        NewWeatherDTO newWeatherDTO = generateNewWeatherDTO(15,
+                LocalDateTime.of(2023, 11, 5, 18, 45),
+                1);
+        when(weatherService.saveWeatherForCity("Minsk", newWeatherDTO))
+                .thenThrow(new HandbookTypeNotFoundException(HttpStatus.NOT_FOUND, "NOT FOUND"));
+        mockMvc.perform(post("/weather/Minsk")
+                        .content(objectMapper.writeValueAsString(newWeatherDTO))
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    public void saveWeather_ShouldThrowBadRequest_WhenWeatherAlreadyExists() throws Exception {
+        NewWeatherDTO newWeatherDTO = generateNewWeatherDTO(15,
+                LocalDateTime.of(2023, 11, 5, 18, 45),
+                1);
+        when(weatherService.saveWeatherForCity("Minsk", newWeatherDTO))
+                .thenThrow(new WeatherAlreadyExistsException(HttpStatus.BAD_REQUEST, "BAD_REQUEST"));
+        mockMvc.perform(post("/weather/Minsk")
+                        .content(objectMapper.writeValueAsString(newWeatherDTO))
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+    }
+
     public WeatherDTO generateWeatherDTO(double temperature, LocalDateTime localDateTime,
                                          String cityName, HandbookDTO handbookDTO) {
         return new WeatherDTO(UUID.randomUUID(), temperature, localDateTime,
                 generateCityDTO(cityName), handbookDTO);
     }
-
     public CityDTO generateCityDTO(String cityName) {
         return new CityDTO(UUID.randomUUID(), cityName);
     }
 
     public HandbookDTO generateHandbookDTO(int id, String typeName) {
         return new HandbookDTO(id, typeName);
+    }
+
+    public NewWeatherDTO generateNewWeatherDTO(double temperature, LocalDateTime localDateTime, int handbookId) {
+        return new NewWeatherDTO(temperature, localDateTime, handbookId);
     }
 }
