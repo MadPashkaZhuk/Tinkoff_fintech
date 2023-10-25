@@ -14,7 +14,6 @@ import org.weather.service.HandbookService;
 import java.util.List;
 
 import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.Matchers.is;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -32,18 +31,15 @@ public class HandbookRestControllerTest {
     public void getAllHandbookTypes_ShouldReturnHandbookList_WhenDataExists() throws Exception {
         HandbookDTO handbookDTO1 = generateHandbookDTO(1, "Sunshine");
         HandbookDTO handbookDTO2 = generateHandbookDTO(2, "Snowing");
-        HandbookDTO handbookDTO3 = generateHandbookDTO(3, "Raining");
         when(handbookService.findAll()).thenReturn(List.of(
                 handbookDTO1,
-                handbookDTO2,
-                handbookDTO3
+                handbookDTO2
         ));
         mockMvc.perform(get("/handbook"))
                 .andExpect(status().isOk())
                 .andExpect(content().json(objectMapper.writeValueAsString(List.of(
                         handbookDTO1,
-                        handbookDTO2,
-                        handbookDTO3
+                        handbookDTO2
                 ))));
 
     }
@@ -58,11 +54,11 @@ public class HandbookRestControllerTest {
 
     @Test
     public void getHandbookTypeById_ShouldReturnHandbookDTO_WhenHandbookExists() throws Exception {
-        when(handbookService.findById(1)).thenReturn(new HandbookDTO(1, "Sunshine"));
+        HandbookDTO handbookDTO = generateHandbookDTO(1, "Sunshine");
+        when(handbookService.findById(1)).thenReturn(handbookDTO);
         mockMvc.perform(get("/handbook/1"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("id", is(1)))
-                .andExpect(jsonPath("type", is("Sunshine")));
+                .andExpect(content().json(objectMapper.writeValueAsString(handbookDTO)));
     }
 
     @Test
