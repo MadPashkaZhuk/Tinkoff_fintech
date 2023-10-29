@@ -46,6 +46,12 @@ dependencies {
     // https://mvnrepository.com/artifact/org.liquibase/liquibase-core
     implementation group: 'org.liquibase', name: 'liquibase-core', version: '4.24.0'
 
+    // https://mvnrepository.com/artifact/org.testcontainers/testcontainers
+    testImplementation group: 'org.testcontainers', name: 'testcontainers'
+
+    // https://mvnrepository.com/artifact/org.testcontainers/junit-jupiter
+    testImplementation group: 'org.testcontainers', name: 'junit-jupiter'
+
     // https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-test
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
 
