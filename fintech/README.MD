@@ -19,6 +19,7 @@ http://localhost:8080/swagger-ui/index.html
 8) Spring Data JPA
 9) JUnit
 10) Mockito
+11) TestContainers
 # Сборка и запуск
 
 ### Сборка
