@@ -17,6 +17,9 @@ http://localhost:8080/swagger-ui/index.html
 6) Spring JDBC
 7) Hibernate
 8) Spring Data JPA
+9) JUnit
+10) Mockito
+11) TestContainers
 # Сборка и запуск
 
 ### Сборка
@@ -26,4 +29,4 @@ http://localhost:8080/swagger-ui/index.html
     ``gradlew build``
 
 ### Запуск
-1. Выполняем: ``java -jar build/libs/fintech-1.2-boot.jar``
+1. Выполняем: ``java -jar build/libs/fintech-1.4-boot.jar``

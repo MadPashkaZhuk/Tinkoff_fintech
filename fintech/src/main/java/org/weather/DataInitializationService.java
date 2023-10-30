@@ -1,6 +1,7 @@
 package org.weather;
 
 import jakarta.annotation.PostConstruct;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 import org.weather.client.WeatherApiRestClient;
 import org.weather.dto.CityDTO;
@@ -16,6 +17,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @Service
+@ConditionalOnProperty(value = "data.initialization", havingValue = "true")
 public class DataInitializationService {
     private final WeatherApiRestClient weatherApiRestClient;
     private final CityService cityService;

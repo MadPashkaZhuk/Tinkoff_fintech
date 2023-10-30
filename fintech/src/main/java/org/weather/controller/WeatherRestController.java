@@ -48,6 +48,8 @@ public class WeatherRestController {
     @Operation(summary = "Add new weather data for specific city")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "New weather data added successfully"),
+            @ApiResponse(responseCode = "400", description = "Weather with this date and city already exists"),
+            @ApiResponse(responseCode = "404", description = "Handbook with this id doesn't exist in database"),
             @ApiResponse(responseCode = "404", description = "City with this name doesn't exist in database")
     })
     @PostMapping("/{cityName}")
