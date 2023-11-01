@@ -14,14 +14,17 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.weather.repository.UserInfoRepository;
+import org.weather.utils.MessageSourceWrapper;
 
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity
 public class SecurityConfig {
     @Bean
-    public UserDetailsService userDetailsService() {
-        return new UserInfoUserDetailsService();
+    public UserDetailsService userDetailsService(UserInfoRepository userInfoRepository,
+                                                 MessageSourceWrapper messageSourceWrapper) {
+        return new UserInfoUserDetailsService(userInfoRepository, messageSourceWrapper);
     }
 
     @Bean
