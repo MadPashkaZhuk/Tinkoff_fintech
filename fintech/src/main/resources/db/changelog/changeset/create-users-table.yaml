@@ -1,0 +1,30 @@
+databaseChangeLog:
+  - changeSet:
+      id: create-user
+      author: Paul
+      changes:
+        - createTable:
+            tableName: users
+            columns:
+              - column:
+                  name: id
+                  type: uuid
+                  autoIncrement: false
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: username
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: password
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: roles
+                  type: varchar(255)
+                  constraints:
+                    nullable: false

@@ -16,7 +16,7 @@ import java.util.Map;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/cities")
+@RequestMapping("/api/cities")
 public class CityRestController {
     private final CityService cityService;
 

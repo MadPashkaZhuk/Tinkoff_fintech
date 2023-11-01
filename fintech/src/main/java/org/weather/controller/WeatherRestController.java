@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/weather")
+@RequestMapping("/api/weather")
 public class WeatherRestController {
     private final WeatherService weatherService;
 
