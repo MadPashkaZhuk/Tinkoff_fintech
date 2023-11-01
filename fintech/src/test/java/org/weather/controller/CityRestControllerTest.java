@@ -3,6 +3,7 @@ package org.weather.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
@@ -22,6 +23,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(CityRestController.class)
+@AutoConfigureMockMvc(addFilters = false)
 public class CityRestControllerTest {
     @Autowired
     private MockMvc mockMvc;
@@ -34,7 +36,7 @@ public class CityRestControllerTest {
     public void getCities_ShouldReturnCityList_WhenDataExists() throws Exception {
         CityDTO cityDTO = generateCityDTO("Minsk");
         when(cityService.findAll()).thenReturn(List.of(cityDTO));
-        mockMvc.perform(get("/cities"))
+        mockMvc.perform(get("/api/cities"))
                 .andExpect(status().isOk())
                 .andExpect(content().json(objectMapper.writeValueAsString(List.of(cityDTO))));
     }
@@ -42,7 +44,7 @@ public class CityRestControllerTest {
     @Test
     public void getCities_ShouldReturnEmptyCityList_WhenNoData() throws Exception {
         when(cityService.findAll()).thenReturn(List.of());
-        mockMvc.perform(get("/cities"))
+        mockMvc.perform(get("/api/cities"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(0)));
     }
@@ -51,7 +53,7 @@ public class CityRestControllerTest {
     public void getCityByName_ShouldReturnCityDTO_WhenCityExists() throws Exception {
         CityDTO cityDTO = generateCityDTO("Minsk");
         when(cityService.findCityByName("Minsk")).thenReturn(cityDTO);
-        mockMvc.perform(get("/cities/name/Minsk"))
+        mockMvc.perform(get("/api/cities/name/Minsk"))
                 .andExpect(status().isOk())
                 .andExpect(content().json(objectMapper.writeValueAsString(cityDTO)));
     }
@@ -60,7 +62,7 @@ public class CityRestControllerTest {
     public void getCityByName_ShouldThrowNotFound_WhenCityDoesntExists() throws Exception {
         when(cityService.findCityByName("Test"))
                 .thenThrow(new CityNotFoundException(HttpStatus.NOT_FOUND, "NOT FOUND"));
-        mockMvc.perform(get("/cities/name/Test"))
+        mockMvc.perform(get("/api/cities/name/Test"))
                 .andExpect(status().isNotFound());
     }
 
@@ -68,7 +70,7 @@ public class CityRestControllerTest {
     public void getCityById_ShouldReturnCityDTO_WhenCityExists() throws Exception {
         CityDTO cityDTO = generateCityDTO("Minsk");
         when(cityService.findCityById(cityDTO.getId())).thenReturn(cityDTO);
-        mockMvc.perform(get("/cities/" + cityDTO.getId()))
+        mockMvc.perform(get("/api/cities/" + cityDTO.getId()))
                 .andExpect(status().isOk())
                 .andExpect(content().json(objectMapper.writeValueAsString(cityDTO)));
     }
@@ -78,7 +80,7 @@ public class CityRestControllerTest {
         UUID id = UUID.randomUUID();
         when(cityService.findCityById(id))
                 .thenThrow(new CityNotFoundException(HttpStatus.NOT_FOUND, "NOT FOUND"));
-        mockMvc.perform(get("/cities/" + id))
+        mockMvc.perform(get("/api/cities/" + id))
                 .andExpect(status().isNotFound());
     }
 
@@ -86,7 +88,7 @@ public class CityRestControllerTest {
     public void saveCity_ShouldReturnCreatedStatusAndCityDTO_WhenCityDoesntExist() throws Exception {
         CityDTO cityDTO = generateCityDTO("Minsk");
         when(cityService.save("Minsk")).thenReturn(cityDTO);
-        mockMvc.perform(post("/cities/Minsk"))
+        mockMvc.perform(post("/api/cities/Minsk"))
                 .andExpect(status().isCreated())
                 .andExpect(content().json(objectMapper.writeValueAsString(cityDTO)))
                 .andReturn();
@@ -96,7 +98,7 @@ public class CityRestControllerTest {
     public void saveCity_ShouldThrowBadRequest_WhenCityAlreadyExists() throws Exception {
         when(cityService.save("Test"))
                 .thenThrow(new CityAlreadyExistsException(HttpStatus.BAD_REQUEST, "BAD REQUEST"));
-        mockMvc.perform(post("/cities/Test"))
+        mockMvc.perform(post("/api/cities/Test"))
                 .andExpect(status().isBadRequest());
     }
 

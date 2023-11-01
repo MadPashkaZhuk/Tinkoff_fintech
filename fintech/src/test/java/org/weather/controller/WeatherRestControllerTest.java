@@ -3,6 +3,7 @@ package org.weather.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
@@ -29,6 +30,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(WeatherRestController.class)
+@AutoConfigureMockMvc(addFilters = false)
 public class WeatherRestControllerTest {
     @Autowired
     MockMvc mockMvc;
@@ -50,7 +52,7 @@ public class WeatherRestControllerTest {
                 "Brest",
                 generateHandbookDTO(2, "Sunshine"));
         when(weatherService.findAll()).thenReturn(List.of(weatherDTO1, weatherDTO2));
-        mockMvc.perform(get("/weather"))
+        mockMvc.perform(get("/api/weather"))
                 .andExpect(status().isOk())
                 .andExpect(content().json(objectMapper.writeValueAsString(List.of(weatherDTO1, weatherDTO2))));
     }
@@ -58,7 +60,7 @@ public class WeatherRestControllerTest {
     @Test
     public void getAllWeather_ShouldReturnEmptyWeatherList_WhenNoData() throws Exception {
         when(weatherService.findAll()).thenReturn(List.of());
-        mockMvc.perform(get("/weather"))
+        mockMvc.perform(get("/api/weather"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(0)));
     }
@@ -71,7 +73,7 @@ public class WeatherRestControllerTest {
                 "Minsk",
                 generateHandbookDTO(1, "Raining"));
         when(weatherService.getWeatherForCity("Minsk")).thenReturn(List.of(weatherDTO1));
-        mockMvc.perform(get("/weather/Minsk"))
+        mockMvc.perform(get("/api/weather/Minsk"))
                 .andExpect(status().isOk())
                 .andExpect(content().json(objectMapper.writeValueAsString(List.of(weatherDTO1))));
     }
@@ -79,7 +81,7 @@ public class WeatherRestControllerTest {
     @Test
     public void getAllWeatherForCity_ShouldReturnEmptyWeatherList_WhenCityExistsAndNoData() throws Exception {
         when(weatherService.getWeatherForCity("Minsk")).thenReturn(List.of());
-        mockMvc.perform(get("/weather/Minsk"))
+        mockMvc.perform(get("/api/weather/Minsk"))
                 .andExpect(status().isOk())
                 .andExpect(content().json(objectMapper.writeValueAsString(List.of())));
     }
@@ -88,7 +90,7 @@ public class WeatherRestControllerTest {
     public void getAllWeatherForCity_ShouldThrowNotFound_WhenCityDoesntExist() throws Exception {
         when(weatherService.getWeatherForCity("Test"))
                 .thenThrow(new WeatherNotFoundException(HttpStatus.NOT_FOUND, "NOT_FOUND"));
-        mockMvc.perform(get("/weather/Test"))
+        mockMvc.perform(get("/api/weather/Test"))
                 .andExpect(status().isNotFound());
     }
 
@@ -102,7 +104,7 @@ public class WeatherRestControllerTest {
                 generateHandbookDTO(1, "Raining")
                 );
         when(weatherService.saveWeatherForCity("Minsk", newWeatherDTO)).thenReturn(weatherDTO);
-        mockMvc.perform(post("/weather/Minsk")
+        mockMvc.perform(post("/api/weather/Minsk")
                         .content(objectMapper.writeValueAsString(newWeatherDTO))
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isCreated())
@@ -116,7 +118,7 @@ public class WeatherRestControllerTest {
                 1);
         when(weatherService.saveWeatherForCity("Minsk", newWeatherDTO))
                 .thenThrow(new CityNotFoundException(HttpStatus.NOT_FOUND, "NOT FOUND"));
-        mockMvc.perform(post("/weather/Minsk")
+        mockMvc.perform(post("/api/weather/Minsk")
                         .content(objectMapper.writeValueAsString(newWeatherDTO))
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound());
@@ -129,7 +131,7 @@ public class WeatherRestControllerTest {
                 1);
         when(weatherService.saveWeatherForCity("Minsk", newWeatherDTO))
                 .thenThrow(new HandbookTypeNotFoundException(HttpStatus.NOT_FOUND, "NOT FOUND"));
-        mockMvc.perform(post("/weather/Minsk")
+        mockMvc.perform(post("/api/weather/Minsk")
                         .content(objectMapper.writeValueAsString(newWeatherDTO))
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound());
@@ -142,7 +144,7 @@ public class WeatherRestControllerTest {
                 1);
         when(weatherService.saveWeatherForCity("Minsk", newWeatherDTO))
                 .thenThrow(new WeatherAlreadyExistsException(HttpStatus.BAD_REQUEST, "BAD_REQUEST"));
-        mockMvc.perform(post("/weather/Minsk")
+        mockMvc.perform(post("/api/weather/Minsk")
                         .content(objectMapper.writeValueAsString(newWeatherDTO))
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
