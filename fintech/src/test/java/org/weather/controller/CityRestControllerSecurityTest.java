@@ -23,7 +23,7 @@ public class CityRestControllerSecurityTest {
     private CityService cityService;
 
     @Test
-    @WithMockUser(authorities = {"USER", "ADMIN"})
+    @WithMockUser(roles = {"USER", "ADMIN"})
     public void getCities_ShouldReturnOkStatus_WhenAuthorized() throws Exception {
         mockMvc.perform(get("/api/cities"))
                 .andExpect(status().isOk())
@@ -39,7 +39,7 @@ public class CityRestControllerSecurityTest {
     }
 
     @Test
-    @WithMockUser(authorities = {"ADMIN"})
+    @WithMockUser(roles = {"ADMIN"})
     public void saveCity_ShouldReturnCreatedStatus_WhenAdminAuthorized() throws Exception {
         mockMvc.perform(post("/api/cities/Minsk"))
                 .andExpect(status().isCreated())
@@ -47,7 +47,7 @@ public class CityRestControllerSecurityTest {
     }
 
     @Test
-    @WithMockUser(authorities = {"USER"})
+    @WithMockUser
     public void saveCity_ShouldReturnForbiddenStatus_WhenUserAuthorized() throws Exception {
         mockMvc.perform(post("/api/cities/Minsk"))
                 .andExpect(status().isForbidden())

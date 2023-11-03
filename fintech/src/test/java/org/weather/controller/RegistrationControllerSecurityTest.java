@@ -37,7 +37,7 @@ public class RegistrationControllerSecurityTest {
     }
 
     @Test
-    @WithMockUser(authorities = {"USER", "ADMIN"})
+    @WithMockUser(roles = {"USER", "ADMIN"})
     public void saveUser_ShouldReturnCreatedStatus_WhenAuthorized() throws Exception {
         UserCredentialsDTO userCredentialsDTO = new UserCredentialsDTO("test", "test");
         mockMvc.perform(post("/api/signup")
