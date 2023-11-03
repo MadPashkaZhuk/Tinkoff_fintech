@@ -15,6 +15,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.weather.repository.UserInfoRepository;
 import org.weather.utils.MessageSourceWrapper;
+import org.weather.utils.enums.UserRoleEnum;
 
 @Configuration
 @EnableWebSecurity
@@ -39,8 +40,9 @@ public class SecurityConfig {
                 .authorizeHttpRequests(
                         (authorize) -> authorize
                                 .requestMatchers(HttpMethod.POST, "/api/signup").permitAll()
-                                .requestMatchers(HttpMethod.GET, "/api/**").hasAnyAuthority("USER", "ADMIN")
-                                .requestMatchers("/api/**").hasAuthority("ADMIN")
+                                .requestMatchers(HttpMethod.GET, "/api/**")
+                                .hasAnyAuthority(UserRoleEnum.ROLE_USER.name(), UserRoleEnum.ROLE_ADMIN.name())
+                                .requestMatchers("/api/**").hasAuthority(UserRoleEnum.ROLE_ADMIN.name())
                                 .anyRequest().authenticated())
                 .csrf(AbstractHttpConfigurer::disable)
                 .httpBasic(Customizer.withDefaults())

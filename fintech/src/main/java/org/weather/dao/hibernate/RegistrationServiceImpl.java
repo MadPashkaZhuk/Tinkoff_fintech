@@ -18,7 +18,7 @@ public class RegistrationServiceImpl {
         UserInfoEntity entity = new UserInfoEntity(
                 userInfo.getUsername(),
                 passwordEncoder.encode(userInfo.getPassword()),
-                UserRoleEnum.USER.getRole()
+                UserRoleEnum.ROLE_USER
         );
         userInfoRepository.save(entity);
     }

@@ -1,11 +1,9 @@
 package org.weather.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.UuidGenerator;
+import org.weather.utils.enums.UserRoleEnum;
 
 import java.util.UUID;
 
@@ -23,12 +21,13 @@ public class UserInfoEntity {
     private String username;
     @Column(name = "password")
     private String password;
-    @Column(name = "roles")
-    private String roles;
+    @Column(name = "role")
+    @Enumerated(EnumType.STRING)
+    private UserRoleEnum role;
 
-    public UserInfoEntity(String username, String password, String roles) {
+    public UserInfoEntity(String username, String password, UserRoleEnum role) {
         this.username = username;
         this.password = password;
-        this.roles = roles;
+        this.role = role;
     }
 }

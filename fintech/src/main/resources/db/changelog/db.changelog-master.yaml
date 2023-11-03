@@ -19,4 +19,3 @@ databaseChangeLog:
       file: db/changelog/changeset/create-users-table.yaml
   - include:
       file: db/changelog/changeset/insert-users-table.yaml
-

@@ -24,7 +24,7 @@ databaseChangeLog:
                   constraints:
                     nullable: false
               - column:
-                  name: roles
+                  name: role
                   type: varchar(255)
                   constraints:
                     nullable: false

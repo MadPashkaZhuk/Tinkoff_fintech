@@ -16,5 +16,5 @@ databaseChangeLog:
                   name: password
                   value: ${admin.password}
               - column:
-                  name: roles
-                  value: 'ADMIN'
+                  name: role
+                  value: ROLE_ADMIN

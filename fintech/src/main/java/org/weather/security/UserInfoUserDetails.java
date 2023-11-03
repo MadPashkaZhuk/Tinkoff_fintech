@@ -5,10 +5,8 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.weather.entity.UserInfoEntity;
 
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class UserInfoUserDetails implements UserDetails {
     private final String username;
@@ -18,9 +16,7 @@ public class UserInfoUserDetails implements UserDetails {
     public UserInfoUserDetails(UserInfoEntity userInfo) {
         this.username = userInfo.getUsername();
         this.password = userInfo.getPassword();
-        this.grantedAuthorities = Arrays.stream(userInfo.getRoles().split(","))
-                .map(SimpleGrantedAuthority::new)
-                .collect(Collectors.toList());
+        this.grantedAuthorities = List.of(new SimpleGrantedAuthority(userInfo.getRole().name()));
     }
 
     @Override
