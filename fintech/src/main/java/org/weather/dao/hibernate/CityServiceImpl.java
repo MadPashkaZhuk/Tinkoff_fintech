@@ -1,5 +1,6 @@
 package org.weather.dao.hibernate;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,18 +19,12 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+@RequiredArgsConstructor
 public class CityServiceImpl implements CityService {
     private final CityRepository cityRepository;
     private final WeatherServiceImpl weatherServiceImpl;
     private final MessageSourceWrapper messageSourceWrapper;
     private final EntityMapper entityMapper;
-    public CityServiceImpl(CityRepository cityRepository, WeatherServiceImpl weatherServiceImpl,
-                           MessageSourceWrapper messageSourceWrapper, EntityMapper entityMapper) {
-        this.cityRepository = cityRepository;
-        this.weatherServiceImpl = weatherServiceImpl;
-        this.messageSourceWrapper = messageSourceWrapper;
-        this.entityMapper = entityMapper;
-    }
 
     public CityDTO save(String cityName) {
         if(hasCityWithName(cityName)) {

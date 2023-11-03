@@ -1,5 +1,6 @@
 package org.weather.dao.hibernate;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.weather.dto.HandbookDTO;
 import org.weather.entity.HandbookEntity;
@@ -14,16 +15,11 @@ import org.weather.utils.enums.WeatherMessageEnum;
 import java.util.List;
 import java.util.Optional;
 
+@RequiredArgsConstructor
 public class HandbookServiceImpl implements HandbookService {
     private final HandbookRepository handbookRepository;
     private final MessageSourceWrapper messageSourceWrapper;
     private final EntityMapper entityMapper;
-
-    public HandbookServiceImpl(HandbookRepository handbookRepository, MessageSourceWrapper messageSourceWrapper, EntityMapper entityMapper) {
-        this.handbookRepository = handbookRepository;
-        this.messageSourceWrapper = messageSourceWrapper;
-        this.entityMapper = entityMapper;
-    }
 
     @Override
     public HandbookDTO save(String weatherType) {

@@ -1,5 +1,6 @@
 package org.weather.security;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -12,14 +13,10 @@ import org.weather.utils.enums.WeatherMessageEnum;
 import java.util.Optional;
 
 @Component
+@RequiredArgsConstructor
 public class UserInfoUserDetailsService implements UserDetailsService {
     private final UserInfoRepository userInfoRepository;
     private final MessageSourceWrapper messageSourceWrapper;
-
-    public UserInfoUserDetailsService(UserInfoRepository userInfoRepository, MessageSourceWrapper messageSourceWrapper) {
-        this.userInfoRepository = userInfoRepository;
-        this.messageSourceWrapper = messageSourceWrapper;
-    }
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {

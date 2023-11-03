@@ -3,6 +3,7 @@ package org.weather.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -15,13 +16,10 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("/api/weather")
 public class WeatherRestController {
     private final WeatherService weatherService;
-
-    public WeatherRestController(WeatherService weatherService) {
-        this.weatherService = weatherService;
-    }
 
     @Operation(summary = "Get all weather in database")
     @ApiResponses(value = {

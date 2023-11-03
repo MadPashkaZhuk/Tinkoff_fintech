@@ -3,6 +3,7 @@ package org.weather.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -16,13 +17,10 @@ import java.util.Map;
 import java.util.UUID;
 
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("/api/cities")
 public class CityRestController {
     private final CityService cityService;
-
-    public CityRestController(CityService cityService) {
-        this.cityService = cityService;
-    }
 
     @Operation(summary = "Show all city info")
     @ApiResponses(value = {
