@@ -6,7 +6,7 @@ http://localhost:8080/swagger-ui/index.html
 
 Предварительно заменитe ${API_KEY} на ваш ключ в application.properties либо используйте его как системную переменную, в таком случае ничего менять не надо.
 
-Аналогично требуется поступить с переменными H2_USERNAME и H2_PASSWORD для подключения к базе данных.
+Аналогично требуется поступить с переменными H2_USERNAME, H2_PASSWORD для подключения к базе данных и ADMIN_USERNAME, ADMIN_PASSWORD для задания параметров администратора.
 ### Внешние зависимости: 
 
 1) Spring Boot
@@ -20,6 +20,7 @@ http://localhost:8080/swagger-ui/index.html
 9) JUnit
 10) Mockito
 11) TestContainers
+12) Spring Security
 # Сборка и запуск
 
 ### Сборка
