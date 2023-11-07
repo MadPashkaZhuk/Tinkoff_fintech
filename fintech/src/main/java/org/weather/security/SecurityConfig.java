@@ -39,7 +39,6 @@ public class SecurityConfig {
         http
                 .authorizeHttpRequests(
                         (authorize) -> authorize
-                                .requestMatchers(HttpMethod.POST, "/api/signup").permitAll()
                                 .requestMatchers(HttpMethod.GET, "/api/**")
                                 .hasAnyAuthority(UserRoleEnum.ROLE_USER.name(), UserRoleEnum.ROLE_ADMIN.name())
                                 .requestMatchers("/api/**").hasAuthority(UserRoleEnum.ROLE_ADMIN.name())

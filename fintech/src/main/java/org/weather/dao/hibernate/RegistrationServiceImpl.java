@@ -17,7 +17,7 @@ public class RegistrationServiceImpl {
     public void addDefaultUser(UserCredentialsDTO userInfo) {
         UserInfoEntity entity = new UserInfoEntity(
                 userInfo.getUsername(),
-                passwordEncoder.encode(userInfo.getPassword()),
+                passwordEncoder.encode(String.valueOf(userInfo.getPassword())),
                 UserRoleEnum.ROLE_USER
         );
         userInfoRepository.save(entity);

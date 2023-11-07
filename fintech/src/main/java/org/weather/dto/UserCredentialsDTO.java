@@ -5,5 +5,5 @@ import lombok.Value;
 @Value
 public class UserCredentialsDTO {
     String username;
-    String password;
+    char[] password;
 }
