@@ -14,8 +14,8 @@ public enum WeatherMessageEnum {
     CITY_NOT_FOUND("city.not.found.message"),
     CITY_ALREADY_EXISTS("city.already.exists.message"),
     HANDBOOK_ALREADY_EXISTS("handbook.already.exists.message"),
-    HANDBOOK_NOT_FOUND("handbook.not.found.message");
-
+    HANDBOOK_NOT_FOUND("handbook.not.found.message"),
+    USER_NOT_FOUND("security.user.not.found.message");
     private final String code;
     WeatherMessageEnum(String code) {
         this.code = code;

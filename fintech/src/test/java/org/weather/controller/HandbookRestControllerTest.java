@@ -3,6 +3,7 @@ package org.weather.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
@@ -21,6 +22,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(HandbookRestController.class)
+@AutoConfigureMockMvc(addFilters = false)
 public class HandbookRestControllerTest {
     @Autowired
     MockMvc mockMvc;
@@ -37,7 +39,7 @@ public class HandbookRestControllerTest {
                 handbookDTO1,
                 handbookDTO2
         ));
-        mockMvc.perform(get("/handbook"))
+        mockMvc.perform(get("/api/handbook"))
                 .andExpect(status().isOk())
                 .andExpect(content().json(objectMapper.writeValueAsString(List.of(
                         handbookDTO1,
@@ -49,7 +51,7 @@ public class HandbookRestControllerTest {
     @Test
     public void getAllHandbookTypes_ShouldReturnEmptyHandbookList_WhenNoData() throws Exception {
         when(handbookService.findAll()).thenReturn(List.of());
-        mockMvc.perform(get("/handbook"))
+        mockMvc.perform(get("/api/handbook"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(0)));
     }
@@ -58,7 +60,7 @@ public class HandbookRestControllerTest {
     public void getHandbookTypeById_ShouldReturnHandbookDTO_WhenHandbookExists() throws Exception {
         HandbookDTO handbookDTO = generateHandbookDTO(1, "Sunshine");
         when(handbookService.findById(1)).thenReturn(handbookDTO);
-        mockMvc.perform(get("/handbook/1"))
+        mockMvc.perform(get("/api/handbook/1"))
                 .andExpect(status().isOk())
                 .andExpect(content().json(objectMapper.writeValueAsString(handbookDTO)));
     }
@@ -67,7 +69,7 @@ public class HandbookRestControllerTest {
     public void getHandbookTypeById_ShouldThrowNotFound_WhenHandbookDoesntExist() throws Exception {
        when(handbookService.findById(1)).
                thenThrow(new HandbookTypeNotFoundException(HttpStatus.NOT_FOUND, "NOT FOUND"));
-       mockMvc.perform(get("/handbook/1"))
+       mockMvc.perform(get("/api/handbook/1"))
                .andExpect(status().isNotFound());
     }
 
@@ -75,7 +77,7 @@ public class HandbookRestControllerTest {
     public void saveHandbook_ShouldReturnCreatedStatusAndHandbookDTO_WhenHandbookDoesntExist() throws Exception {
         HandbookDTO handbookDTO = generateHandbookDTO(1, "Sunshine");
         when(handbookService.save("Sunshine")).thenReturn(handbookDTO);
-        mockMvc.perform(post("/handbook/Sunshine"))
+        mockMvc.perform(post("/api/handbook/Sunshine"))
                 .andExpect(status().isCreated())
                 .andExpect(content().json(objectMapper.writeValueAsString(handbookDTO)));
     }
@@ -84,7 +86,7 @@ public class HandbookRestControllerTest {
     public void saveHandbook_ShouldThrowBadRequest_WhenHandbookAlreadyExists() throws Exception {
         when(handbookService.save("Test"))
                 .thenThrow(new HandbookAlreadyExistsException(HttpStatus.BAD_REQUEST, "BAD REQUEST"));
-        mockMvc.perform(post("/handbook/Test"))
+        mockMvc.perform(post("/api/handbook/Test"))
                 .andExpect(status().isBadRequest());
     }
 

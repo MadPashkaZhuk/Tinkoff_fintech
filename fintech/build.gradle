@@ -46,6 +46,9 @@ dependencies {
     // https://mvnrepository.com/artifact/org.liquibase/liquibase-core
     implementation group: 'org.liquibase', name: 'liquibase-core', version: '4.24.0'
 
+    // https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-security
+    implementation group: 'org.springframework.boot', name: 'spring-boot-starter-security'
+
     // https://mvnrepository.com/artifact/org.testcontainers/testcontainers
     testImplementation group: 'org.testcontainers', name: 'testcontainers'
 
@@ -54,6 +57,9 @@ dependencies {
 
     // https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-test
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
+
+    // https://mvnrepository.com/artifact/org.springframework.security/spring-security-test
+    testImplementation group: 'org.springframework.security', name: 'spring-security-test'
 
     // https://mvnrepository.com/artifact/org.projectlombok/lombok
     compileOnly 'org.projectlombok:lombok'

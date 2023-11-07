@@ -1,6 +1,7 @@
 package org.weather;
 
 import jakarta.annotation.PostConstruct;
+import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 import org.weather.client.WeatherApiRestClient;
@@ -17,22 +18,13 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 @ConditionalOnProperty(value = "data.initialization", havingValue = "true")
 public class DataInitializationService {
     private final WeatherApiRestClient weatherApiRestClient;
     private final CityService cityService;
     private final WeatherService weatherService;
     private final HandbookService handbookService;
-
-    public DataInitializationService(WeatherApiRestClient weatherApiRestClient,
-                                     CityService cityService,
-                                     WeatherService weatherService,
-                                     HandbookService handbookService) {
-        this.weatherApiRestClient = weatherApiRestClient;
-        this.cityService = cityService;
-        this.weatherService = weatherService;
-        this.handbookService = handbookService;
-    }
 
     @PostConstruct
     public void initializeData() {
@@ -52,4 +44,3 @@ public class DataInitializationService {
         return DateTimeFormatter.ofPattern("yyyy-MM-d H:m");
     }
 }
-
