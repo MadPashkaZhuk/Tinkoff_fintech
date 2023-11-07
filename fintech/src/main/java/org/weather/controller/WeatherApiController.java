@@ -3,6 +3,7 @@ package org.weather.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -11,13 +12,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.weather.client.WeatherApiRestClient;
 
 @Controller
-@RequestMapping("/external/weatherapi")
+@RequiredArgsConstructor
+@RequestMapping("/api/external/weatherapi")
 public class WeatherApiController {
     private final WeatherApiRestClient weatherApiRestClient;
-
-    public WeatherApiController(WeatherApiRestClient weatherApiRestClient) {
-        this.weatherApiRestClient = weatherApiRestClient;
-    }
 
     @Operation(summary = "Get temperature from weatherapi.com",
             description = "Get temperature from weatherapi.com by region name provided")
