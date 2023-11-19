@@ -4,6 +4,7 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.http.HttpStatus;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
+import org.weather.cache.WeatherCache;
 import org.weather.dto.CityDTO;
 import org.weather.dto.HandbookDTO;
 import org.weather.dto.NewWeatherDTO;
@@ -18,7 +19,9 @@ import org.weather.utils.EntityMapper;
 import org.weather.utils.MessageSourceWrapper;
 import org.weather.utils.enums.WeatherMessageEnum;
 
+import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 
 public class WeatherServiceImpl implements WeatherService {
     private final WeatherRepository weatherRepository;
@@ -26,19 +29,33 @@ public class WeatherServiceImpl implements WeatherService {
     private final HandbookServiceImpl handbookServiceImpl;
     private final MessageSourceWrapper messageSourceWrapper;
     private final EntityMapper entityMapper;
+    private final WeatherCache weatherCache;
 
     public WeatherServiceImpl(WeatherRepository weatherRepository,
                               @Lazy CityServiceImpl cityServiceImpl,
                               HandbookServiceImpl handbookServiceImpl,
-                              MessageSourceWrapper messageSourceWrapper, EntityMapper entityMapper) {
+                              MessageSourceWrapper messageSourceWrapper, EntityMapper entityMapper,
+                              WeatherCache weatherCache) {
         this.weatherRepository = weatherRepository;
         this.cityServiceImpl = cityServiceImpl;
         this.handbookServiceImpl = handbookServiceImpl;
         this.messageSourceWrapper = messageSourceWrapper;
         this.entityMapper = entityMapper;
+        this.weatherCache = weatherCache;
     }
 
-    public List<WeatherDTO> getWeatherForCity(String cityName) {
+    public WeatherDTO getWeatherForCity(String cityName) {
+        Optional<WeatherDTO> cacheVal = weatherCache.getWeather(cityName);
+        if(cacheVal.isPresent()) {
+            return cacheVal.get();
+        }
+        WeatherDTO currentData = getWeatherHistoryForCity(cityName).stream()
+                .max(Comparator.comparing(WeatherDTO::getDateTime)).get();
+        weatherCache.addWeather(currentData);
+        return currentData;
+    }
+
+    public List<WeatherDTO> getWeatherHistoryForCity(String cityName) {
         CityEntity city = getCityEntityByNameFromRepo(cityName);
         return mapWeatherEntityListToDtoList(weatherRepository.findWeatherByCity(city));
     }
@@ -54,7 +71,10 @@ public class WeatherServiceImpl implements WeatherService {
                 newWeatherData.getDateTime(),
                 getHandbookEntityById(newWeatherData.getHandbook_id()));
         weatherRepository.save(weather);
-        return mapWeatherEntityToDTO(weather);
+
+        WeatherDTO weatherDTO = mapWeatherEntityToDTO(weather);
+        weatherCache.updateWeather(weatherDTO);
+        return weatherDTO;
     }
 
     @Transactional(isolation = Isolation.READ_COMMITTED)
@@ -92,9 +112,11 @@ public class WeatherServiceImpl implements WeatherService {
         HandbookEntity handbook = getHandbookEntityById(newWeatherData.getHandbook_id());
         weatherRepository.updateWeatherById(currentWeather.getId(),
                 newWeatherData.getTemp_val(), handbook);
-        return new WeatherDTO(currentWeather.getId(), newWeatherData.getTemp_val(), currentWeather.getDatetime(),
-                mapCityEntityToDTO(currentWeather.getCity()),
+        WeatherDTO weatherDTO =  new WeatherDTO(currentWeather.getId(), newWeatherData.getTemp_val(),
+                currentWeather.getDatetime(), mapCityEntityToDTO(currentWeather.getCity()),
                 mapHandbookEntityToDTO(getHandbookEntityById(newWeatherData.getHandbook_id())));
+        weatherCache.updateWeather(weatherDTO);
+        return weatherDTO;
     }
 
     private CityEntity getCityEntityByNameFromRepo(String cityName) {

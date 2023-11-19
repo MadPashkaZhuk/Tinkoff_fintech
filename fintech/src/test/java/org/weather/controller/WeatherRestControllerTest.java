@@ -72,25 +72,25 @@ public class WeatherRestControllerTest {
                 LocalDateTime.of(2023, 11, 5, 18, 45),
                 "Minsk",
                 generateHandbookDTO(1, "Raining"));
-        when(weatherService.getWeatherForCity("Minsk")).thenReturn(List.of(weatherDTO1));
-        mockMvc.perform(get("/api/weather/Minsk"))
+        when(weatherService.getWeatherHistoryForCity("Minsk")).thenReturn(List.of(weatherDTO1));
+        mockMvc.perform(get("/api/weather/history/Minsk"))
                 .andExpect(status().isOk())
                 .andExpect(content().json(objectMapper.writeValueAsString(List.of(weatherDTO1))));
     }
 
     @Test
     public void getAllWeatherForCity_ShouldReturnEmptyWeatherList_WhenCityExistsAndNoData() throws Exception {
-        when(weatherService.getWeatherForCity("Minsk")).thenReturn(List.of());
-        mockMvc.perform(get("/api/weather/Minsk"))
+        when(weatherService.getWeatherHistoryForCity("Minsk")).thenReturn(List.of());
+        mockMvc.perform(get("/api/weather/history/Minsk"))
                 .andExpect(status().isOk())
                 .andExpect(content().json(objectMapper.writeValueAsString(List.of())));
     }
 
     @Test
     public void getAllWeatherForCity_ShouldThrowNotFound_WhenCityDoesntExist() throws Exception {
-        when(weatherService.getWeatherForCity("Test"))
+        when(weatherService.getWeatherHistoryForCity("Test"))
                 .thenThrow(new WeatherNotFoundException(HttpStatus.NOT_FOUND, "NOT_FOUND"));
-        mockMvc.perform(get("/api/weather/Test"))
+        mockMvc.perform(get("/api/weather/history/Test"))
                 .andExpect(status().isNotFound());
     }
 

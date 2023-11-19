@@ -18,6 +18,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
+import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
 
@@ -47,8 +48,15 @@ public class WeatherServiceJdbcImpl implements WeatherService {
         });
     }
 
+    public WeatherDTO getWeatherForCity(String cityName) {
+        return getWeatherHistoryForCity(cityName).stream()
+                .max(Comparator.comparing(WeatherDTO::getDateTime))
+                .get();
+
+    }
+
     @Override
-    public List<WeatherDTO> getWeatherForCity(String cityName) {
+    public List<WeatherDTO> getWeatherHistoryForCity(String cityName) {
         return transactionManagerHelper.executeInReadCommittedTransaction(status -> {
             CityDTO city = getCityByName(cityName);
             final String findAllWeatherForCityQuery = "SELECT * FROM weather WHERE city_id = ?";
