@@ -46,6 +46,8 @@ public class WeatherServiceTest {
     static void setPropertySource(DynamicPropertyRegistry dynamicPropertySource) {
         dynamicPropertySource.add("spring.datasource.url",
                 () -> String.format("jdbc:h2:tcp://localhost:%d/test", h2.getMappedPort(1521)));
+        dynamicPropertySource.add("cache.course.ttl",
+                () -> 1);
     }
 
     @BeforeAll
@@ -77,7 +79,7 @@ public class WeatherServiceTest {
     }
 
     @Test
-    public void getWeatherForCity_ShouldTakeFromCacheAndGoToDatabaseOnce_WhenSecondCall() {
+    public void getWeatherForCity_ShouldTakeFromCache_WhenSecondCall() {
         weatherService.saveWeatherForCity("Minsk", new NewWeatherDTO(
                 13, LocalDateTime.now(), 1
         ));
@@ -95,7 +97,7 @@ public class WeatherServiceTest {
     }
 
     @Test
-    public void saveWeatherForCity_ShouldUpdateExistingData_IfDataWasAlreadyCached() {
+    public void saveWeatherForCity_ShouldUpdateExistingData_WhenDataWasAlreadyCached() {
         weatherService.saveWeatherForCity("Minsk", new NewWeatherDTO(
                 13, LocalDateTime.MIN, 1
         ));
@@ -107,7 +109,7 @@ public class WeatherServiceTest {
     }
 
     @Test
-    public void updateWeatherForCity_ShouldUpdateExistingData_IfDataWasAlreadyCached() {
+    public void updateWeatherForCity_ShouldUpdateExistingData_WhenDataWasAlreadyCached() {
         weatherService.saveWeatherForCity("Minsk", new NewWeatherDTO(
                 13, LocalDateTime.MIN, 1
         ));
@@ -116,5 +118,15 @@ public class WeatherServiceTest {
         ));
         Mockito.verify(weatherCache, Mockito.times(2)).updateWeather(Mockito.any());
         assertEquals(20, weatherCache.getWeather("Minsk").get().getTemperature());
+    }
+
+    @Test
+    public void getWeatherForCity_ShouldUpdateData_WhenExpired() throws Exception {
+        weatherService.saveWeatherForCity("Minsk", new NewWeatherDTO(
+                13, LocalDateTime.MIN, 1
+        ));
+        Thread.sleep(60000);
+        weatherService.getWeatherForCity("Minsk");
+        Mockito.verify(weatherCache, Mockito.times(2)).updateWeather(Mockito.any());
     }
 }

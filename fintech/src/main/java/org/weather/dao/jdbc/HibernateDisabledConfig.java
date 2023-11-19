@@ -33,7 +33,9 @@ public class HibernateDisabledConfig {
     public WeatherServiceJdbcImpl weatherServiceHibernateDisabled(DataSource dataSource,
                                                                   @Lazy CityServiceJdbcImpl cityService,
                                                                   HandbookServiceJdbcImpl handbookService,
-                                                                  TransactionManagerHelper transactionManagerHelper) {
-        return new WeatherServiceJdbcImpl(dataSource, cityService, handbookService, transactionManagerHelper);
+                                                                  TransactionManagerHelper transactionManagerHelper,
+                                                                  MessageSourceWrapper messageSourceWrapper) {
+        return new WeatherServiceJdbcImpl(dataSource, cityService, handbookService,
+                transactionManagerHelper, messageSourceWrapper);
     }
 }

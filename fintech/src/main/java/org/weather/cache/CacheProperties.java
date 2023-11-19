@@ -11,4 +11,5 @@ import org.springframework.stereotype.Component;
 @ConfigurationProperties(prefix = "cache.course")
 public class CacheProperties {
     private int size;
+    private int ttl;
 }

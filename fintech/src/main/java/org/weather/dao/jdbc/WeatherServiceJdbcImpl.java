@@ -2,6 +2,7 @@ package org.weather.dao.jdbc;
 
 import org.springframework.context.annotation.Lazy;
 import org.springframework.dao.DataAccessException;
+import org.springframework.http.HttpStatus;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.TransactionCallbackWithoutResult;
@@ -10,8 +11,11 @@ import org.weather.dto.HandbookDTO;
 import org.weather.dto.NewWeatherDTO;
 import org.weather.dto.WeatherDTO;
 import org.weather.exception.sql.WeatherSqlException;
+import org.weather.exception.weather.WeatherNotFoundException;
 import org.weather.service.WeatherService;
+import org.weather.utils.MessageSourceWrapper;
 import org.weather.utils.TransactionManagerHelper;
+import org.weather.utils.enums.WeatherMessageEnum;
 
 import javax.sql.DataSource;
 import java.sql.ResultSet;
@@ -27,14 +31,17 @@ public class WeatherServiceJdbcImpl implements WeatherService {
     private final CityServiceJdbcImpl cityService;
     private final HandbookServiceJdbcImpl handbookService;
     private final TransactionManagerHelper transactionManagerHelper;
+    private final MessageSourceWrapper messageSourceWrapper;
     public WeatherServiceJdbcImpl(DataSource dataSource,
                                   @Lazy CityServiceJdbcImpl cityService,
                                   HandbookServiceJdbcImpl handbookService,
-                                  TransactionManagerHelper transactionManagerHelper) {
+                                  TransactionManagerHelper transactionManagerHelper,
+                                  MessageSourceWrapper messageSourceWrapper) {
         this.jdbcTemplate = new JdbcTemplate(dataSource);
         this.cityService = cityService;
         this.handbookService = handbookService;
         this.transactionManagerHelper = transactionManagerHelper;
+        this.messageSourceWrapper = messageSourceWrapper;
     }
     @Override
     public List<WeatherDTO> findAll() {
@@ -50,9 +57,9 @@ public class WeatherServiceJdbcImpl implements WeatherService {
 
     public WeatherDTO getWeatherForCity(String cityName) {
         return getWeatherHistoryForCity(cityName).stream()
-                .max(Comparator.comparing(WeatherDTO::getDateTime))
-                .get();
-
+                .max(Comparator.comparing(WeatherDTO::getDateTime)).orElseThrow(() -> new WeatherNotFoundException(
+                        HttpStatus.NOT_FOUND, messageSourceWrapper.getMessageCode(WeatherMessageEnum.WEATHER_NOT_FOUND)
+                ));
     }
 
     @Override

@@ -1,9 +1,13 @@
 package org.weather.cache;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.stereotype.Component;
 import org.weather.dto.WeatherDTO;
 
 import java.lang.ref.SoftReference;
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
@@ -26,7 +30,7 @@ public class WeatherCache {
     public Optional<WeatherDTO> getWeather(String location) {
         synchronized (lock) {
             Node node = cacheMap.get(location);
-            if (node == null || node.getData() == null || node.getData().get() == null) {
+            if (node == null || node.getData() == null || node.getData().get() == null || isExpired(node)) {
                 return Optional.empty();
             }
             cacheList.remove(node);
@@ -37,14 +41,9 @@ public class WeatherCache {
 
     public void addWeather(WeatherDTO weatherDTO) {
         synchronized (lock) {
-            Node node = new Node(weatherDTO.getCity().getName(), new SoftReference<>(weatherDTO));
+            Node node = new Node(weatherDTO.getCity().getName(), new SoftReference<>(weatherDTO), LocalDateTime.now());
             cacheMap.put(node.location, node);
             cacheList.addFirst(node);
-
-            if (cacheList.size() > cacheProperties.getSize()) {
-                Node nodeToRemove = cacheList.removeLast();
-                cacheMap.remove(nodeToRemove.getLocation());
-            }
         }
     }
 
@@ -56,29 +55,34 @@ public class WeatherCache {
             } else {
                 node.getData().clear();
                 node.setData(new SoftReference<>(weatherDTO));
+                node.setCreated_at(LocalDateTime.now());
+            }
+            cleanUpCache();
+        }
+    }
+
+    private boolean isExpired(Node node) {
+        LocalDateTime expirationTime = node.getCreated_at().plusMinutes(cacheProperties.getTtl());
+        return LocalDateTime.now().isAfter(expirationTime);
+    }
+
+    private void cleanUpCache() {
+        synchronized (lock) {
+            cacheList.removeIf(this::isExpired);
+            cacheMap.entrySet().removeIf(entry -> isExpired(entry.getValue()));
+            if (cacheList.size() > cacheProperties.getSize()) {
+                Node nodeToRemove = cacheList.removeLast();
+                cacheMap.remove(nodeToRemove.getLocation());
             }
         }
     }
 
+    @Getter
+    @Setter
+    @AllArgsConstructor
     private static class Node {
         private final String location;
         private SoftReference<WeatherDTO> data;
-
-        public Node(String location, SoftReference<WeatherDTO> data) {
-            this.location = location;
-            this.data = data;
-        }
-
-        public String getLocation() {
-            return location;
-        }
-
-        public SoftReference<WeatherDTO> getData() {
-            return data;
-        }
-
-        public void setData(SoftReference<WeatherDTO> data) {
-            this.data = data;
-        }
+        private LocalDateTime created_at;
     }
 }

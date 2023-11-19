@@ -12,6 +12,7 @@ import org.weather.dto.WeatherDTO;
 import org.weather.entity.CityEntity;
 import org.weather.entity.HandbookEntity;
 import org.weather.entity.WeatherEntity;
+import org.weather.exception.weather.WeatherAlreadyExistsException;
 import org.weather.exception.weather.WeatherNotFoundException;
 import org.weather.repository.WeatherRepository;
 import org.weather.service.WeatherService;
@@ -50,8 +51,10 @@ public class WeatherServiceImpl implements WeatherService {
             return cacheVal.get();
         }
         WeatherDTO currentData = getWeatherHistoryForCity(cityName).stream()
-                .max(Comparator.comparing(WeatherDTO::getDateTime)).get();
-        weatherCache.addWeather(currentData);
+                .max(Comparator.comparing(WeatherDTO::getDateTime)).orElseThrow(() -> new WeatherNotFoundException(
+                        HttpStatus.NOT_FOUND, messageSourceWrapper.getMessageCode(WeatherMessageEnum.WEATHER_NOT_FOUND)
+                ));
+        weatherCache.updateWeather(currentData);
         return currentData;
     }
 
@@ -63,7 +66,7 @@ public class WeatherServiceImpl implements WeatherService {
     public WeatherDTO saveWeatherForCity(String cityName, NewWeatherDTO newWeatherData) {
         CityEntity city = getCityEntityByNameFromRepo(cityName);
         if(weatherRepository.getWeatherByCityAndDatetime(city, newWeatherData.getDateTime()) != null) {
-            throw new WeatherNotFoundException(HttpStatus.BAD_REQUEST,
+            throw new WeatherAlreadyExistsException(HttpStatus.BAD_REQUEST,
                     messageSourceWrapper.getMessageCode(WeatherMessageEnum.WEATHER_ALREADY_EXISTS));
         }
         WeatherEntity weather = new WeatherEntity(newWeatherData.getTemp_val(),
