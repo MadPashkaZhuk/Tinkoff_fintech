@@ -4,6 +4,8 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.http.HttpStatus;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
+import org.weather.cache.Cache;
+import org.weather.cache.CacheHelper;
 import org.weather.dto.CityDTO;
 import org.weather.dto.HandbookDTO;
 import org.weather.dto.NewWeatherDTO;
@@ -11,6 +13,7 @@ import org.weather.dto.WeatherDTO;
 import org.weather.entity.CityEntity;
 import org.weather.entity.HandbookEntity;
 import org.weather.entity.WeatherEntity;
+import org.weather.exception.weather.WeatherAlreadyExistsException;
 import org.weather.exception.weather.WeatherNotFoundException;
 import org.weather.repository.WeatherRepository;
 import org.weather.service.WeatherService;
@@ -18,6 +21,7 @@ import org.weather.utils.EntityMapper;
 import org.weather.utils.MessageSourceWrapper;
 import org.weather.utils.enums.WeatherMessageEnum;
 
+import java.util.Comparator;
 import java.util.List;
 
 public class WeatherServiceImpl implements WeatherService {
@@ -26,19 +30,31 @@ public class WeatherServiceImpl implements WeatherService {
     private final HandbookServiceImpl handbookServiceImpl;
     private final MessageSourceWrapper messageSourceWrapper;
     private final EntityMapper entityMapper;
+    private final Cache cache;
 
     public WeatherServiceImpl(WeatherRepository weatherRepository,
                               @Lazy CityServiceImpl cityServiceImpl,
                               HandbookServiceImpl handbookServiceImpl,
-                              MessageSourceWrapper messageSourceWrapper, EntityMapper entityMapper) {
+                              MessageSourceWrapper messageSourceWrapper, EntityMapper entityMapper,
+                              Cache cache) {
         this.weatherRepository = weatherRepository;
         this.cityServiceImpl = cityServiceImpl;
         this.handbookServiceImpl = handbookServiceImpl;
         this.messageSourceWrapper = messageSourceWrapper;
         this.entityMapper = entityMapper;
+        this.cache = cache;
     }
 
-    public List<WeatherDTO> getWeatherForCity(String cityName) {
+    public WeatherDTO getWeatherForCity(String cityName) {
+        return CacheHelper.getFromCache(cache, cityName,
+                () -> getWeatherHistoryForCity(cityName).stream()
+                .max(Comparator.comparing(WeatherDTO::getDateTime)).orElseThrow(() ->
+                        new WeatherNotFoundException(HttpStatus.NOT_FOUND,
+                                messageSourceWrapper.getMessageCode(WeatherMessageEnum.WEATHER_NOT_FOUND)
+                        )));
+    }
+
+    public List<WeatherDTO> getWeatherHistoryForCity(String cityName) {
         CityEntity city = getCityEntityByNameFromRepo(cityName);
         return mapWeatherEntityListToDtoList(weatherRepository.findWeatherByCity(city));
     }
@@ -46,7 +62,7 @@ public class WeatherServiceImpl implements WeatherService {
     public WeatherDTO saveWeatherForCity(String cityName, NewWeatherDTO newWeatherData) {
         CityEntity city = getCityEntityByNameFromRepo(cityName);
         if(weatherRepository.getWeatherByCityAndDatetime(city, newWeatherData.getDateTime()) != null) {
-            throw new WeatherNotFoundException(HttpStatus.BAD_REQUEST,
+            throw new WeatherAlreadyExistsException(HttpStatus.BAD_REQUEST,
                     messageSourceWrapper.getMessageCode(WeatherMessageEnum.WEATHER_ALREADY_EXISTS));
         }
         WeatherEntity weather = new WeatherEntity(newWeatherData.getTemp_val(),
@@ -54,7 +70,10 @@ public class WeatherServiceImpl implements WeatherService {
                 newWeatherData.getDateTime(),
                 getHandbookEntityById(newWeatherData.getHandbook_id()));
         weatherRepository.save(weather);
-        return mapWeatherEntityToDTO(weather);
+
+        WeatherDTO weatherDTO = mapWeatherEntityToDTO(weather);
+        cache.put(weatherDTO.getCity().getName(), weatherDTO);
+        return weatherDTO;
     }
 
     @Transactional(isolation = Isolation.READ_COMMITTED)
@@ -92,9 +111,11 @@ public class WeatherServiceImpl implements WeatherService {
         HandbookEntity handbook = getHandbookEntityById(newWeatherData.getHandbook_id());
         weatherRepository.updateWeatherById(currentWeather.getId(),
                 newWeatherData.getTemp_val(), handbook);
-        return new WeatherDTO(currentWeather.getId(), newWeatherData.getTemp_val(), currentWeather.getDatetime(),
-                mapCityEntityToDTO(currentWeather.getCity()),
+        WeatherDTO weatherDTO =  new WeatherDTO(currentWeather.getId(), newWeatherData.getTemp_val(),
+                currentWeather.getDatetime(), mapCityEntityToDTO(currentWeather.getCity()),
                 mapHandbookEntityToDTO(getHandbookEntityById(newWeatherData.getHandbook_id())));
+        cache.put(weatherDTO.getCity().getName(), weatherDTO);
+        return weatherDTO;
     }
 
     private CityEntity getCityEntityByNameFromRepo(String cityName) {

@@ -4,6 +4,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Lazy;
+import org.weather.cache.Cache;
 import org.weather.repository.CityRepository;
 import org.weather.repository.HandbookRepository;
 import org.weather.repository.WeatherRepository;
@@ -29,8 +30,9 @@ public class HibernateEnabledConfig {
                                              @Lazy CityServiceImpl cityServiceImpl,
                                              HandbookServiceImpl handbookServiceImpl,
                                              MessageSourceWrapper messageSourceWrapper,
-                                             EntityMapper entityMapper) {
-        return new WeatherServiceImpl(weatherRepository, cityServiceImpl,
-                handbookServiceImpl, messageSourceWrapper, entityMapper);
+                                             EntityMapper entityMapper,
+                                             Cache cache) {
+        return new WeatherServiceImpl(weatherRepository, cityServiceImpl, handbookServiceImpl, messageSourceWrapper,
+                entityMapper, cache);
     }
 }

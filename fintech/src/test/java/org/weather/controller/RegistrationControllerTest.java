@@ -26,7 +26,7 @@ class RegistrationControllerTest {
 
     @Test
     void saveUser_ShouldReturnCreatedStatus_WhenSystemWorks() throws Exception {
-        UserCredentialsDTO userCredentialsDTO = new UserCredentialsDTO("test", "test");
+        UserCredentialsDTO userCredentialsDTO = new UserCredentialsDTO("test", "test".toCharArray());
         mockMvc.perform(post("/api/signup")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(userCredentialsDTO)))

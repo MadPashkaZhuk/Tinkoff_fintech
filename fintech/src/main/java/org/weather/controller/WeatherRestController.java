@@ -36,8 +36,20 @@ public class WeatherRestController {
             @ApiResponse(responseCode = "200", description = "Weather data retrieved successfully"),
             @ApiResponse(responseCode = "404", description = "City with this name doesn't exist in database")
     })
-    @GetMapping("/{cityName}")
+    @GetMapping("/history/{cityName}")
     ResponseEntity<?> getAllWeatherForCity(@PathVariable("cityName") String cityName) {
+        return ResponseEntity.ok()
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(weatherService.getWeatherHistoryForCity(cityName));
+    }
+
+    @Operation(summary = "Get latest weather info by city's name")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Weather data retrieved successfully"),
+            @ApiResponse(responseCode = "404", description = "City with this name doesn't exist in database")
+    })
+    @GetMapping("/{cityName}")
+    ResponseEntity<?> getWeatherForCity(@PathVariable("cityName") String cityName) {
         return ResponseEntity.ok()
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(weatherService.getWeatherForCity(cityName));
