@@ -69,8 +69,6 @@ public class CacheImpl implements Cache {
 
     private void cleanUpCache() {
         synchronized (lock) {
-            cacheList.removeIf(this::isExpired);
-            cacheMap.entrySet().removeIf(entry -> isExpired(entry.getValue()));
             if (cacheList.size() > cacheProperties.getSize()) {
                 Node nodeToRemove = cacheList.removeLast();
                 cacheMap.remove(nodeToRemove.getKey());
