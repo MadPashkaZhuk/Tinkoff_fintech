@@ -54,7 +54,7 @@ public class CacheImpl implements Cache {
         }
     }
 
-    public void addNewValue(Object key, Object value) {
+    private void addNewValue(Object key, Object value) {
         synchronized (lock) {
             Node node = new Node<>(key, new SoftReference<>(value), LocalDateTime.now());
             cacheMap.put(node.key, node);
