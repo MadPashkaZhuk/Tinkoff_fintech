@@ -4,7 +4,8 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.http.HttpStatus;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
-import org.weather.cache.WeatherCache;
+import org.weather.cache.Cache;
+import org.weather.cache.CacheHelper;
 import org.weather.dto.CityDTO;
 import org.weather.dto.HandbookDTO;
 import org.weather.dto.NewWeatherDTO;
@@ -22,7 +23,6 @@ import org.weather.utils.enums.WeatherMessageEnum;
 
 import java.util.Comparator;
 import java.util.List;
-import java.util.Optional;
 
 public class WeatherServiceImpl implements WeatherService {
     private final WeatherRepository weatherRepository;
@@ -30,32 +30,28 @@ public class WeatherServiceImpl implements WeatherService {
     private final HandbookServiceImpl handbookServiceImpl;
     private final MessageSourceWrapper messageSourceWrapper;
     private final EntityMapper entityMapper;
-    private final WeatherCache weatherCache;
+    private final Cache cache;
 
     public WeatherServiceImpl(WeatherRepository weatherRepository,
                               @Lazy CityServiceImpl cityServiceImpl,
                               HandbookServiceImpl handbookServiceImpl,
                               MessageSourceWrapper messageSourceWrapper, EntityMapper entityMapper,
-                              WeatherCache weatherCache) {
+                              Cache cache) {
         this.weatherRepository = weatherRepository;
         this.cityServiceImpl = cityServiceImpl;
         this.handbookServiceImpl = handbookServiceImpl;
         this.messageSourceWrapper = messageSourceWrapper;
         this.entityMapper = entityMapper;
-        this.weatherCache = weatherCache;
+        this.cache = cache;
     }
 
     public WeatherDTO getWeatherForCity(String cityName) {
-        Optional<WeatherDTO> cacheVal = weatherCache.getWeather(cityName);
-        if(cacheVal.isPresent()) {
-            return cacheVal.get();
-        }
-        WeatherDTO currentData = getWeatherHistoryForCity(cityName).stream()
-                .max(Comparator.comparing(WeatherDTO::getDateTime)).orElseThrow(() -> new WeatherNotFoundException(
-                        HttpStatus.NOT_FOUND, messageSourceWrapper.getMessageCode(WeatherMessageEnum.WEATHER_NOT_FOUND)
-                ));
-        weatherCache.updateWeather(currentData);
-        return currentData;
+        return CacheHelper.getFromCache(cache, cityName,
+                () -> getWeatherHistoryForCity(cityName).stream()
+                .max(Comparator.comparing(WeatherDTO::getDateTime)).orElseThrow(() ->
+                        new WeatherNotFoundException(HttpStatus.NOT_FOUND,
+                                messageSourceWrapper.getMessageCode(WeatherMessageEnum.WEATHER_NOT_FOUND)
+                        )));
     }
 
     public List<WeatherDTO> getWeatherHistoryForCity(String cityName) {
@@ -76,7 +72,7 @@ public class WeatherServiceImpl implements WeatherService {
         weatherRepository.save(weather);
 
         WeatherDTO weatherDTO = mapWeatherEntityToDTO(weather);
-        weatherCache.updateWeather(weatherDTO);
+        cache.put(weatherDTO.getCity().getName(), weatherDTO);
         return weatherDTO;
     }
 
@@ -118,7 +114,7 @@ public class WeatherServiceImpl implements WeatherService {
         WeatherDTO weatherDTO =  new WeatherDTO(currentWeather.getId(), newWeatherData.getTemp_val(),
                 currentWeather.getDatetime(), mapCityEntityToDTO(currentWeather.getCity()),
                 mapHandbookEntityToDTO(getHandbookEntityById(newWeatherData.getHandbook_id())));
-        weatherCache.updateWeather(weatherDTO);
+        cache.put(weatherDTO.getCity().getName(), weatherDTO);
         return weatherDTO;
     }
 

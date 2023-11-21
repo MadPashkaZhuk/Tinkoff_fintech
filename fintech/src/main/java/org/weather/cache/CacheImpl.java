@@ -4,7 +4,6 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.stereotype.Component;
-import org.weather.dto.WeatherDTO;
 
 import java.lang.ref.SoftReference;
 import java.time.LocalDateTime;
@@ -14,55 +13,57 @@ import java.util.Map;
 import java.util.Optional;
 
 @Component
-public class WeatherCache {
-    private final Map<String, Node> cacheMap;
+public class CacheImpl implements Cache {
+    private final Map<Object, Node> cacheMap;
     private final LinkedList<Node> cacheList;
     private final CacheProperties cacheProperties;
     private final Object lock;
 
-    public WeatherCache(CacheProperties cacheProperties) {
+    public CacheImpl(CacheProperties cacheProperties) {
         this.cacheMap = new HashMap<>();
         this.cacheList = new LinkedList<>();
         this.cacheProperties = cacheProperties;
         this.lock = new Object();
     }
 
-    public Optional<WeatherDTO> getWeather(String location) {
+    @Override
+    public <T> Optional<T> get(Object key, Class<T> valueType) {
         synchronized (lock) {
-            Node node = cacheMap.get(location);
+            Node node = cacheMap.get(key);
             if (node == null || node.getData() == null || node.getData().get() == null || isExpired(node)) {
                 return Optional.empty();
             }
             cacheList.remove(node);
             cacheList.addFirst(node);
-            return Optional.ofNullable(node.getData().get());
+            return Optional.ofNullable(valueType.cast(node.getData().get()));
         }
     }
 
-    public void addWeather(WeatherDTO weatherDTO) {
+    @Override
+    public void put(Object key, Object value) {
         synchronized (lock) {
-            Node node = new Node(weatherDTO.getCity().getName(), new SoftReference<>(weatherDTO), LocalDateTime.now());
-            cacheMap.put(node.location, node);
-            cacheList.addFirst(node);
-        }
-    }
-
-    public void updateWeather(WeatherDTO weatherDTO) {
-        synchronized (lock) {
-            Node node = cacheMap.get(weatherDTO.getCity().getName());
+            Node node = cacheMap.get(key);
             if (node == null) {
-                addWeather(weatherDTO);
+                addNewValue(key, value);
             } else {
                 node.getData().clear();
-                node.setData(new SoftReference<>(weatherDTO));
-                node.setCreated_at(LocalDateTime.now());
+                node.setData(new SoftReference<>(value));
+                node.setCreatedAt(LocalDateTime.now());
             }
             cleanUpCache();
         }
     }
 
+    public void addNewValue(Object key, Object value) {
+        synchronized (lock) {
+            Node node = new Node<>(key, new SoftReference<>(value), LocalDateTime.now());
+            cacheMap.put(node.key, node);
+            cacheList.addFirst(node);
+        }
+    }
+
     private boolean isExpired(Node node) {
-        LocalDateTime expirationTime = node.getCreated_at().plusMinutes(cacheProperties.getTtl());
+        LocalDateTime expirationTime = node.getCreatedAt().plus(cacheProperties.getTtl());
         return LocalDateTime.now().isAfter(expirationTime);
     }
 
@@ -72,7 +73,7 @@ public class WeatherCache {
             cacheMap.entrySet().removeIf(entry -> isExpired(entry.getValue()));
             if (cacheList.size() > cacheProperties.getSize()) {
                 Node nodeToRemove = cacheList.removeLast();
-                cacheMap.remove(nodeToRemove.getLocation());
+                cacheMap.remove(nodeToRemove.getKey());
             }
         }
     }
@@ -80,9 +81,9 @@ public class WeatherCache {
     @Getter
     @Setter
     @AllArgsConstructor
-    private static class Node {
-        private final String location;
-        private SoftReference<WeatherDTO> data;
-        private LocalDateTime created_at;
+    private static class Node <K, V> {
+        private final K key;
+        private SoftReference<V> data;
+        private LocalDateTime createdAt;
     }
 }
