@@ -7,6 +7,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.test.context.support.WithAnonymousUser;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
@@ -28,18 +29,20 @@ public class RegistrationControllerSecurityTest {
 
     @Test
     @WithAnonymousUser
-    public void saveUser_ShouldReturnCreatedStatus_WhenAnonymous() throws Exception {
-        UserCredentialsDTO userCredentialsDTO = new UserCredentialsDTO("test", "test");
+    public void saveUser_ShouldReturnUnauthorizedStatus_WhenAnonymous() throws Exception {
+        UserCredentialsDTO userCredentialsDTO = new UserCredentialsDTO("test",
+                new BCryptPasswordEncoder().encode("test").toCharArray());
         mockMvc.perform(post("/api/signup")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(userCredentialsDTO)))
-                .andExpect(status().isCreated());
+                .andExpect(status().isUnauthorized());
     }
 
     @Test
     @WithMockUser(roles = {"USER", "ADMIN"})
     public void saveUser_ShouldReturnCreatedStatus_WhenAuthorized() throws Exception {
-        UserCredentialsDTO userCredentialsDTO = new UserCredentialsDTO("test", "test");
+        UserCredentialsDTO userCredentialsDTO = new UserCredentialsDTO("test",
+                new BCryptPasswordEncoder().encode("test").toCharArray());
         mockMvc.perform(post("/api/signup")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(userCredentialsDTO)))
