@@ -91,7 +91,6 @@ public class WeatherApiRestClient {
             );
             return responseEntity;
         } catch (HttpStatusCodeException ex) {
-            System.out.println(ex.getMessage());
             throw getWeatherApiExceptionFromHttpException(ex);
         } catch (Throwable ex) {
             throw new WeatherApiUnknownException(HttpStatus.INTERNAL_SERVER_ERROR,
