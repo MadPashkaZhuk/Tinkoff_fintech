@@ -106,6 +106,21 @@ public class WeatherServiceImpl implements WeatherService {
         return updateExistingWeather(currentWeather, newWeatherData);
     }
 
+    @Override
+    public Double getAverageForCity(String cityName) {
+        List<WeatherEntity> weatherEntityList = getTop30NewestWeatherForCity(cityName);
+        double avg = 0;
+        for (WeatherEntity weatherEntity : weatherEntityList) {
+            avg += weatherEntity.getTemp_c();
+        }
+        return avg / weatherEntityList.size();
+    }
+
+    private List<WeatherEntity> getTop30NewestWeatherForCity(String cityName) {
+        CityEntity city = getCityEntityByNameFromRepo(cityName);
+        return weatherRepository.findTop30ByCityOrderByDatetimeDesc(city);
+    }
+
     @Transactional(isolation = Isolation.READ_COMMITTED)
     public WeatherDTO updateExistingWeather(WeatherEntity currentWeather, NewWeatherDTO newWeatherData) {
         HandbookEntity handbook = getHandbookEntityById(newWeatherData.getHandbook_id());
