@@ -128,7 +128,7 @@ public class WeatherServiceJdbcImpl implements WeatherService {
 
     @Override
     public Double getAverageForCity(String cityName) {
-        return null; // method implemented only in Hibernate realization
+        throw new UnsupportedOperationException();
     }
 
     public WeatherDTO updateExistingWeather(WeatherDTO currentWeather, NewWeatherDTO newWeatherDTO) {

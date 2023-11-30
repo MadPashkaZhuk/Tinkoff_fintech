@@ -31,7 +31,7 @@ public class WeatherApiScheduler {
     }
 
     @Scheduled(cron = "${topic.average.cron}")
-    public void test() {
+    public void scheduledAvgCalculation() {
         currentCityIndex.set(currentCityIndex.get() % averageTopicProperties.getCities().size());
         String currentCity = averageTopicProperties.getCities().get(currentCityIndex.getAndIncrement());
         WeatherApiDTO weatherApiDTO = weatherApiRestClient.getDTOFromWeatherApi(currentCity);

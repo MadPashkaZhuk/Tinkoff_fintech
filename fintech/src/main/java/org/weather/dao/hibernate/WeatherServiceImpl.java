@@ -109,10 +109,10 @@ public class WeatherServiceImpl implements WeatherService {
     @Override
     public Double getAverageForCity(String cityName) {
         List<WeatherEntity> weatherEntityList = getTop30NewestWeatherForCity(cityName);
-        double avg = 0;
-        for (WeatherEntity weatherEntity : weatherEntityList) {
-            avg += weatherEntity.getTemp_c();
-        }
+        double avg = weatherEntityList.stream()
+                .mapToDouble(WeatherEntity::getTemp_c)
+                .average()
+                .orElse(0.0);
         return avg / weatherEntityList.size();
     }
 
