@@ -30,4 +30,5 @@ public interface WeatherRepository extends JpaRepository<WeatherEntity, UUID> {
     @Transactional
     void deleteAllByCity(CityEntity city);
     WeatherEntity getWeatherByCityAndDatetime(CityEntity city, LocalDateTime dateTime);
+    List<WeatherEntity> findTop30ByCityOrderByDatetimeDesc(CityEntity city);
 }

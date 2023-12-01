@@ -23,6 +23,8 @@ http://localhost:8080/swagger-ui/index.html
 10) Mockito
 11) TestContainers
 12) Spring Security
+13) Docker
+14) Kafka
 # Сборка и запуск
 
 ### Сборка
