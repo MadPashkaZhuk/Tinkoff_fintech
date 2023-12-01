@@ -126,6 +126,11 @@ public class WeatherServiceJdbcImpl implements WeatherService {
         return updateExistingWeather(currentWeather, newWeatherDTO);
     }
 
+    @Override
+    public Double getAverageForCity(String cityName) {
+        throw new UnsupportedOperationException();
+    }
+
     public WeatherDTO updateExistingWeather(WeatherDTO currentWeather, NewWeatherDTO newWeatherDTO) {
         return transactionManagerHelper.executeInReadCommittedTransaction(status -> {
             final String updateWeatherQuery = "UPDATE weather SET temperature = ?, handbook_id = ? WHERE id = ?";

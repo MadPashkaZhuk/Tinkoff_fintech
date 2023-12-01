@@ -12,4 +12,5 @@ public interface WeatherService {
     WeatherDTO saveWeatherForCity(String cityName, NewWeatherDTO newWeatherDTO);
     void deleteWeatherByDateTime(String cityName, NewWeatherDTO newWeatherDTO);
     WeatherDTO updateWeatherForCity(String cityName, NewWeatherDTO newWeatherDTO);
+    Double getAverageForCity(String cityName);
 }
