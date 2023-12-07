@@ -25,6 +25,8 @@ http://localhost:8080/swagger-ui/index.html
 12) Spring Security
 13) Docker
 14) Kafka
+15) Logback & SLF4J
+
 # Сборка и запуск
 
 ### Сборка
